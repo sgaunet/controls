@@ -2,6 +2,7 @@ package sshctl
 
 import (
 	"fmt"
+	"io/ioutil"
 	"time"
 
 	"sgaunet/controls/config"
@@ -10,6 +11,19 @@ import (
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
 )
+
+func PublicKeyFile(file string) ssh.AuthMethod {
+	buffer, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil
+	}
+
+	key, err := ssh.ParsePrivateKey(buffer)
+	if err != nil {
+		return nil
+	}
+	return ssh.PublicKeys(key)
+}
 
 func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report *doc.MarkDownDoc) *doc.MarkDownDoc {
 	red := color.New(color.FgRed, color.Bold)
@@ -24,14 +38,26 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 	fmt.Printf("%-30s | %-60s | %-30s | %-30s |\n", "Host", "Cmd", "Expected", "Result")
 	idx := 0
 	for _, server := range cfgSrv {
-		sshConfig := &ssh.ClientConfig{
-			User: server.User,
-			Auth: []ssh.AuthMethod{
-				ssh.Password(server.Password),
-				//PublicKeyFile("../.vagrant/machines/c7/virtualbox/private_key"),
-			},
-			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-			Timeout:         2 * time.Second,
+		var sshConfig *ssh.ClientConfig
+
+		if len(server.Sshkey) != 0 {
+			sshConfig = &ssh.ClientConfig{
+				User: server.User,
+				Auth: []ssh.AuthMethod{
+					PublicKeyFile(server.Sshkey),
+				},
+				HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+				Timeout:         2 * time.Second,
+			}
+		} else {
+			sshConfig = &ssh.ClientConfig{
+				User: server.User,
+				Auth: []ssh.AuthMethod{
+					ssh.Password(server.Password),
+				},
+				HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+				Timeout:         2 * time.Second,
+			}
 		}
 
 		connection, err := ssh.Dial("tcp", server.Host+":22", sshConfig)
