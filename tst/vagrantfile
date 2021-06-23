@@ -1,0 +1,39 @@
+IMAGE_NAME = "bento/ubuntu-18.04"
+N = 2
+
+Vagrant.configure("2") do |config|
+    config.ssh.insert_key = true
+
+    config.vm.provider "virtualbox" do |v|
+        v.memory = 2048
+        v.cpus = 2
+        # disable log file
+        v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+    end
+      
+    config.vm.define "ex-0" do |master|
+        master.vm.box = IMAGE_NAME
+        master.vm.network "private_network", ip: "10.0.50.10"
+        master.vm.hostname = "ex-0"
+        # master.vm.provision "ansible" do |ansible|
+        #     ansible.playbook = "setup/playbook1.yml"
+        #     ansible.extra_vars = {
+        #         node_ip: "10.0.50.10",
+        #     }
+        # end
+    end
+
+    (1..N).each do |i|
+        config.vm.define "ex-#{i}" do |node|
+            node.vm.box = IMAGE_NAME
+            node.vm.network "private_network", ip: "10.0.50.#{i + 10}"
+            node.vm.hostname = "ex-#{i}"
+            # node.vm.provision "ansible" do |ansible|
+            #     ansible.playbook = "setup/playbook.yml"
+            #     ansible.extra_vars = {
+            #         node_ip: "10.0.50.#{i + 10}",
+            #     }
+            # end
+        end
+    end
+end

@@ -1,0 +1,32 @@
+sshAsserts:
+  GROUP1:
+    - cmd: "systemctl status ntpd > /dev/null 2>&1; echo $?"
+      expected: "0"
+  GROUP2:
+    - cmd: script.sh | awk '($3=="running"){ print $0 }' | wc -l
+      expected: "18"
+    - cmd: echo foo
+      expected: "foo"
+
+sshServers:
+  GROUP1:
+    - host: 10.0.50.10
+      user: vagrant
+      password: 
+      sshkey: /home/sylvain/GITHUB/PUBLIC/controls/tst/.vagrant/machines/ex-0/virtualbox/private_key
+    - host: 10.0.50.11
+      user: vagrant
+      password: 
+      sshkey: /home/sylvain/GITHUB/PUBLIC/controls/tst/.vagrant/machines/ex-1/virtualbox/private_key
+  GROUP2:
+    - host: 10.0.50.12
+      user: vagrant
+      password: 
+      sshkey: /home/sylvain/GITHUB/PUBLIC/controls/tst/.vagrant/machines/ex-2/virtualbox/private_key
+
+assertsHTTP:
+  - host: https://www.google.fr
+    #hostheader: real.dns.fr
+  - host: https://www.docker.com
+  - host: https://www.docker.fr
+  - host: https://github.com
