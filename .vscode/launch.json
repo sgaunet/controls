@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/src",
-            "args": ["-f" ,"${workspaceFolder}/tst/conf.yaml" ]
+            "args": ["-f" ,"${workspaceFolder}/tst/controls.yaml","-o" ,"${workspaceFolder}/tst/res.md" ]
         }
     ]
 }
