@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -14,16 +13,43 @@ import (
 
 	"github.com/atsushinee/go-markdown-generator/doc"
 	_ "github.com/lib/pq"
+	log "github.com/sirupsen/logrus"
 )
+
+func initTrace(debugLevel string) {
+	// Log as JSON instead of the default ASCII formatter.
+	//log.SetFormatter(&log.JSONFormatter{})
+	// log.SetFormatter(&log.TextFormatter{
+	// 	DisableColors: true,
+	// 	FullTimestamp: true,
+	// })
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	log.SetOutput(os.Stdout)
+
+	switch debugLevel {
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	default:
+		log.SetLevel(log.DebugLevel)
+	}
+}
 
 func main() {
 	var configFile string
 	var reportPath string
+	var debugLevel string
 	flag.StringVar(&configFile, "f", "", "YAML file to parse.")
 	flag.StringVar(&reportPath, "o", "", "Report tot create (md format")
-	// listOption := flag.Bool("list", false, "List WMS subscriptions")
-
+	flag.StringVar(&debugLevel, "d", "debug", "Debug level (info,warn,debug)")
 	flag.Parse()
+
+	initTrace(debugLevel)
 
 	if len(reportPath) == 0 {
 		flag.PrintDefaults()
@@ -64,6 +90,7 @@ func main() {
 			for assertsGroupName, asserts := range configApp.SshAsserts {
 				if serverGroupName == assertsGroupName {
 					report = sshctl.LaunchControls(servers, asserts, report)
+					break
 				}
 			}
 		}
