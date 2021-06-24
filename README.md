@@ -69,3 +69,20 @@ zbxCtl:
   severityThreshold: 4
 ```
 
+# Tests
+
+## Pre requisites
+
+* vagrant
+* virtualbox
+* Golang
+
+## Launch tests
+
+```
+$ cd tst
+$ vagrant up
+...
+$ ./tests.sh
+```
+
