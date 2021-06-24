@@ -3,3 +3,4 @@ dist
 .vagrant
 result.md
 result.html
+controls.yaml
