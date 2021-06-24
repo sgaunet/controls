@@ -2,6 +2,7 @@ package sshctl
 
 import (
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"sgaunet/controls/config"
@@ -24,6 +25,11 @@ func PublicKeyFile(file string) ssh.AuthMethod {
 	return ssh.PublicKeys(key)
 }
 
+func EscapeForMarkdown(str string) string {
+	tmp := strings.ReplaceAll(str, "\n", "<br>")
+	return strings.ReplaceAll(tmp, "|", "\\|")
+}
+
 func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report *doc.MarkDownDoc) *doc.MarkDownDoc {
 	red := color.New(color.FgRed, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
@@ -33,7 +39,6 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 	t.SetTitle(2, "Result Expected")
 	t.SetTitle(3, "Result")
 
-	//fmt.Printf("%-30s | %-60s | %-30s | %-30s |\n", "Host", "Cmd", "Expected", "Result")
 	idx := 0
 	for _, server := range cfgSrv {
 		var sshConfig ssh.ClientConfig
@@ -68,7 +73,7 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				// 				red.Printf("%-30s | %-60s | %-30s | %-30s |\n", server.Host, control.Cmd, "N/A", "Failed to connect")
 				red.Printf("Host : %30s      -- Failed to connect\n", server.Host)
 				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, control.Cmd)
+				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
 				t.SetContent(idx, 2, "N/A")
 				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to connect</span>")
 				idx++
@@ -84,8 +89,8 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				// fmt.Printf("Failed to create session: %s\n", err)
 				red.Printf("Host : %30s      -- Failed to create session\n", server.Host)
 				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, control.Cmd)
-				t.SetContent(idx, 2, control.ExpectedResult)
+				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
 				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to create session</span>")
 				idx++
 				continue
@@ -96,14 +101,14 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				// fmt.Printf("Failed to use session: %s\n", err)
 				red.Printf("Host : %30s      -- Failed to use session\n", server.Host)
 				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, control.Cmd)
-				t.SetContent(idx, 2, control.ExpectedResult)
+				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
 				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to use session</span>")
 				//idx++
 				continue
 			}
 			if len(output) != 0 {
-				newOutput = string(output)[0 : len(string(output))-1]
+				newOutput = string(output)[0 : len(string(output))-1] // Remove the EOL
 			}
 			// session.Wait()
 			session.Close()
@@ -115,9 +120,9 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				green.Printf("Expected Result : %s\n", control.ExpectedResult)
 				green.Printf("Output          : %s\n\n", newOutput)
 				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, control.Cmd)
-				t.SetContent(idx, 2, control.ExpectedResult)
-				t.SetContent(idx, 3, "<span style=\"color:green\">"+newOutput+"</span>")
+				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
+				t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:green\">"+newOutput+"</span>"))
 			} else {
 				//red.Printf("%-30s | %-60s | %-30s | %-30s |\n", server.Host, control.Cmd, control.ExpectedResult, newOutput)
 				red.Printf("Host            : %s\n", server.Host)
@@ -125,9 +130,9 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				red.Printf("Expected Result : %s\n", control.ExpectedResult)
 				red.Printf("Output          : %s\n\n", newOutput)
 				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, control.Cmd)
-				t.SetContent(idx, 2, control.ExpectedResult)
-				t.SetContent(idx, 3, "<span style=\"color:red\">"+newOutput+"</span>")
+				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
+				t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:red\">"+newOutput+"</span>"))
 			}
 			idx++
 		}
