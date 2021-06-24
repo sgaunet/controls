@@ -133,7 +133,6 @@ func main() {
 	report.WriteTitle("Infos", 2)
 	report.WriteLines(1)
 	report.Write("Generated at :" + time.Now().String() + "<br>")
-	report.WriteLinkLine("docexpl", "http://docexpl.mtrg.local")
 
 	err = report.Export(reportPath)
 	if err != nil {
