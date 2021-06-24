@@ -24,10 +24,12 @@ RUN addgroup -S ctluser_group -g 1000 && adduser -S ctluser -G ctluser_group --u
 RUN apk add --update --no-cache bash \
     && rm -rf /tmp/* /var/cache/apk/*
 
-RUN wget https://github.com/sgaunet/mdtohtml/releases/download/0.2/mdtohtml_0.2_Linux_x86_64.tar.gz \
-    && tar zxvf mdtohtml_0.2_Linux_x86_64.tar.gz \
+ENV MDTOHTML_VERSION=0.3.1
+
+RUN wget https://github.com/sgaunet/mdtohtml/releases/download/${MDTOHTML_VERSION}/mdtohtml_${MDTOHTML_VERSION}_Linux_x86_64.tar.gz \
+    && tar zxvf mdtohtml_${MDTOHTML_VERSION}_Linux_x86_64.tar.gz \
     && mv mdtohtml /usr/bin/mdtohtml \
-    && rm mdtohtml_0.2_Linux_x86_64.tar.gz
+    && rm mdtohtml_${MDTOHTML_VERSION}_Linux_x86_64.tar.gz
 
 COPY --from=builder /go/src/controls            /usr/bin/controls
 RUN chmod +x /usr/bin/controls
