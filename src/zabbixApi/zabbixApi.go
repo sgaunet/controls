@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/atsushinee/go-markdown-generator/doc"
 	"github.com/fatih/color"
 )
 
@@ -48,7 +47,8 @@ func New(login string, password string, url string, sinceMs int, severityThresho
 	var zbxResp zbxLoginReturn
 	err = json.Unmarshal(body, &zbxResp)
 	if err != nil {
-		fmt.Printf("toto %s %d %s\n", zbxResp.Result, resp.StatusCode, string(body))
+		fmt.Printf("Error : %s %d %s\n", zbxResp.Result, resp.StatusCode, string(body))
+		fmt.Fprintln(os.Stderr, err.Error())
 		return z, err
 	}
 	if len(zbxResp.Result) == 0 {
@@ -77,7 +77,7 @@ func (z *ZabbixApi) Logout() {
 	//fmt.Println(string(body))
 }
 
-func (z *ZabbixApi) LaunchControls(report *doc.MarkDownDoc) *doc.MarkDownDoc {
+func (z *ZabbixApi) LaunchControls() [][]string {
 	red := color.New(color.FgRed, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
 	since := strconv.FormatInt(time.Now().Add(time.Duration(-z.since*int(time.Second))).Unix(), 10)
@@ -112,12 +112,13 @@ func (z *ZabbixApi) LaunchControls(report *doc.MarkDownDoc) *doc.MarkDownDoc {
 	var resultProblems zbxResultProblem
 	json.Unmarshal(body, &resultProblems)
 
-	nbCfg := len(resultProblems.Result)
-	t := doc.NewTable(nbCfg, 3)
-	t.SetTitle(0, "Problem")
-	t.SetTitle(1, "Severity")
-	t.SetTitle(2, "...")
-	fmt.Printf("%-70s | %-10s | %-10s |\n", "Problem", "Severity", "...")
+	// nbCfg := len(resultProblems.Result)
+	// t := doc.NewTable(nbCfg, 3)
+	// t.SetTitle(0, "Problem")
+	// t.SetTitle(1, "Severity")
+	// t.SetTitle(2, "...")
+	var reportTable [][]string
+	reportTable = append(reportTable, []string{"Problem", "Severity", "Comment"})
 	idx := 0
 
 	for _, pb := range resultProblems.Result {
@@ -126,21 +127,16 @@ func (z *ZabbixApi) LaunchControls(report *doc.MarkDownDoc) *doc.MarkDownDoc {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
 		if pbSeverity >= z.severityThreshold {
-			red.Println(pb.Name)
-			red.Printf("%-70s | %-10s | %-10s |\n", pb.Name, pb.Severity, "")
-			t.SetContent(idx, 0, pb.Name)
-			t.SetContent(idx, 1, pb.Severity)
-			t.SetContent(idx, 2, "<span style=\"color:red\">ERR</span>")
+			red.Printf("Problem : %s\n", pb.Name, pb.Severity, "")
+			red.Printf("Severity: %s\n", pb.Name, pb.Severity, "")
+			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:red\">ERR</span>"})
 		} else {
-			green.Println(pb.Name)
-			green.Printf("%-70s | %-10s | %-10s |\n", pb.Name, pb.Severity, "")
-			t.SetContent(idx, 0, pb.Name)
-			t.SetContent(idx, 1, pb.Severity)
-			t.SetContent(idx, 2, "<span style=\"color:green\">OK</span>")
+			green.Printf("Problem : %s\n", pb.Name, pb.Severity, "")
+			green.Printf("Severity: %s\n", pb.Name, pb.Severity, "")
+			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:green\">OK</span>"})
 		}
 		idx++
 	}
 
-	report.WriteTable(t)
-	return report
+	return reportTable
 }

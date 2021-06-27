@@ -7,7 +7,6 @@ import (
 
 	"sgaunet/controls/config"
 
-	"github.com/atsushinee/go-markdown-generator/doc"
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
 )
@@ -30,14 +29,16 @@ func EscapeForMarkdown(str string) string {
 	return strings.ReplaceAll(tmp, "|", "\\|")
 }
 
-func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report *doc.MarkDownDoc) *doc.MarkDownDoc {
+func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH) [][]string {
 	red := color.New(color.FgRed, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
-	t := doc.NewTable(len(cfgSrv)*len(asserts), 4)
-	t.SetTitle(0, "Host")
-	t.SetTitle(1, "Cmd")
-	t.SetTitle(2, "Result Expected")
-	t.SetTitle(3, "Result")
+
+	resultTable := [][]string{{"Host", "Cmd", "Expected Result", "Result"}}
+	// t := doc.NewTable(len(cfgSrv)*len(asserts), 4)
+	// t.SetTitle(0, "Host")
+	// t.SetTitle(1, "Cmd")
+	// t.SetTitle(2, "Result Expected")
+	// t.SetTitle(3, "Result")
 
 	idx := 0
 	for _, server := range cfgSrv {
@@ -72,10 +73,11 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 			for _, control := range asserts {
 				// 				red.Printf("%-30s | %-60s | %-30s | %-30s |\n", server.Host, control.Cmd, "N/A", "Failed to connect")
 				red.Printf("Host : %30s      -- Failed to connect\n", server.Host)
-				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
-				t.SetContent(idx, 2, "N/A")
-				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to connect</span>")
+				// t.SetContent(idx, 0, server.Host)
+				// t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				// t.SetContent(idx, 2, "N/A")
+				// t.SetContent(idx, 3, "<span style=\"color:red\">Failed to connect</span>")
+				resultTable = append(resultTable, []string{server.Host, EscapeForMarkdown(control.Cmd), "N/A", "<span style=\"color:red\">Failed to connect</span>"})
 				idx++
 			}
 			continue
@@ -83,15 +85,17 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 		defer connection.Close()
 
 		for _, control := range asserts {
+			sshControl := sshControl{server: server.Host,
+				cmd:            control.Cmd,
+				expectedResult: control.ExpectedResult}
+
 			var newOutput string
 			session, err := connection.NewSession()
 			if err != nil {
 				// fmt.Printf("Failed to create session: %s\n", err)
+				sshControl.SetOutput("Failed to create session", false)
 				red.Printf("Host : %30s      -- Failed to create session\n", server.Host)
-				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
-				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
-				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to create session</span>")
+				resultTable = append(resultTable, sshControl.GetResultLine())
 				idx++
 				continue
 			}
@@ -99,12 +103,14 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 			output, err := session.CombinedOutput(control.Cmd)
 			if err != nil {
 				// fmt.Printf("Failed to use session: %s\n", err)
-				red.Printf("Host : %30s      -- Failed to use session\n", server.Host)
-				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
-				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
-				t.SetContent(idx, 3, "<span style=\"color:red\">Failed to use session</span>")
+				// t.SetContent(idx, 0, server.Host)
+				// t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				// t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
+				// t.SetContent(idx, 3, "<span style=\"color:red\">Failed to use session</span>")
 				//idx++
+				sshControl.SetOutput("Failed to use session", false)
+				red.Printf("Host : %30s      -- Failed to use session\n", server.Host)
+				resultTable = append(resultTable, sshControl.GetResultLine())
 				continue
 			}
 			if len(output) != 0 {
@@ -119,27 +125,31 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH, report 
 				green.Printf("Command         : %s\n", control.Cmd)
 				green.Printf("Expected Result : %s\n", control.ExpectedResult)
 				green.Printf("Output          : %s\n\n", newOutput)
-				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
-				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
-				t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:green\">"+newOutput+"</span>"))
+				// t.SetContent(idx, 0, server.Host)
+				// t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				// t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
+				// t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:green\">"+newOutput+"</span>"))
+				sshControl.SetOutput(newOutput, true)
+				resultTable = append(resultTable, sshControl.GetResultLine())
+				sshControl.PrintToStdout()
 			} else {
 				//red.Printf("%-30s | %-60s | %-30s | %-30s |\n", server.Host, control.Cmd, control.ExpectedResult, newOutput)
 				red.Printf("Host            : %s\n", server.Host)
 				red.Printf("Command         : %s\n", control.Cmd)
 				red.Printf("Expected Result : %s\n", control.ExpectedResult)
 				red.Printf("Output          : %s\n\n", newOutput)
-				t.SetContent(idx, 0, server.Host)
-				t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
-				t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
-				t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:red\">"+newOutput+"</span>"))
+				// t.SetContent(idx, 0, server.Host)
+				// t.SetContent(idx, 1, EscapeForMarkdown(control.Cmd))
+				// t.SetContent(idx, 2, EscapeForMarkdown(control.ExpectedResult))
+				// t.SetContent(idx, 3, EscapeForMarkdown("<span style=\"color:red\">"+newOutput+"</span>"))
+				//resultTable = append(resultTable, []string{server.Host, EscapeForMarkdown(control.Cmd), EscapeForMarkdown(control.ExpectedResult), EscapeForMarkdown("<span style=\"color:red\">" + newOutput + "</span>")})
+				sshControl.SetOutput(newOutput, false)
+				resultTable = append(resultTable, sshControl.GetResultLine())
+				sshControl.PrintToStdout()
 			}
 			idx++
 		}
-		//idx++
 	}
 
-	report.WriteTable(t)
-	report.WriteLines(1)
-	return report
+	return resultTable
 }
