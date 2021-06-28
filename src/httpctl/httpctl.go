@@ -66,14 +66,6 @@ func (c *httpControl) ctlHTTP(assertHTTP config.AssertHTTP) []string {
 }
 
 func LaunchControls(asserts []config.AssertHTTP) [][]string {
-	//var urlToControl string
-	// red := color.New(color.FgRed, color.Bold)
-	// green := color.New(color.FgGreen, color.Bold)
-	// nbAsserts := len(asserts)
-	// t := doc.NewTable(nbAsserts, 5)
-	// t.SetTitle(0, "URL")
-	// t.SetTitle(1, "HTTP Status Code")
-	// t.SetTitle(2, "Comment")
 	resultTable := [][]string{{"URL", "Http StatusCode", "Comment"}}
 
 	idx := 0
@@ -85,37 +77,7 @@ func LaunchControls(asserts []config.AssertHTTP) [][]string {
 		}
 		resultTable = append(resultTable, newHttpControl.ctlHTTP(assert))
 		newHttpControl.PrintToStdout()
-
-		// if err != nil {
-		// 	red.Printf("URL: %s\n", urlToControl)
-		// 	red.Printf("Error: %s\n", err.Error())
-		// 	red.Printf("Comment: %s \n", assert.Comment)
-		// 	// t.SetContent(idx, 0, urlToControl)
-		// 	// t.SetContent(idx, 1, "<span style=\"color:red\">ERR :"+err.Error()+"</span>")
-		// 	// t.SetContent(idx, 2, assert.Comment)
-		// 	resultTable = append(resultTable, []string{urlToControl, "<span style=\"color:red\">ERR :" + err.Error() + "</span>", assert.Comment})
-		// } else {
-		// 	if !(statusCode >= 400) {
-		// 		green.Printf("URL: %s\n", urlToControl)
-		// 		green.Printf("StatusCode: %d\n", statusCode)
-		// 		green.Printf("Comment: %s \n", assert.Comment)
-		// 		//green.Printf("%-100s | %-20d | %-20s |\n", urlToControl, statusCode, assert.Comment)
-		// 		resultTable = append(resultTable, []string{urlToControl, "<span style=\"color:green\">" + strconv.Itoa(statusCode) + "</span>", assert.Comment})
-		// 	} else {
-		// 		//red.Printf("%-100s | %-20d | %-20s |\n", urlToControl, statusCode, assert.Comment)
-		// 		// t.SetContent(idx, 0, urlToControl)
-		// 		// t.SetContent(idx, 1, "<span style=\"color:red\">"+strconv.Itoa(statusCode)+"</span>")
-		// 		// t.SetContent(idx, 2, assert.Comment)
-		// 		red.Printf("URL: %s\n", urlToControl)
-		// 		red.Printf("StatusCode: %s\n", err.Error())
-		// 		red.Printf("Comment: %s \n", assert.Comment)
-		// 		//red.Printf("%-100s | %-20d | %-20s |\n", urlToControl, statusCode, assert.Comment)
-		// 		resultTable = append(resultTable, []string{urlToControl, "<span style=\"color:red\">" + strconv.Itoa(statusCode) + "</span>", assert.Comment})
-		// 	}
-		// }
 		idx++
 	}
-
-	//report.WriteTable(t)
 	return resultTable
 }
