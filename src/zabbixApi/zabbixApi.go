@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -38,7 +37,8 @@ func New(login string, password string, url string, sinceMs int, severityThresho
 	responseBody := bytes.NewBuffer(postBody)
 	resp, err := http.Post(url, "application/json", responseBody)
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		// log.Fatalf("An Error Occured %v", err)
+		return z, err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -58,7 +58,7 @@ func New(login string, password string, url string, sinceMs int, severityThresho
 	return z, err
 }
 
-func (z *ZabbixApi) Logout() {
+func (z *ZabbixApi) Logout() error {
 	data2 := zbxLogout{
 		JsonRPC: "2.0",
 		Method:  "user.logout",
@@ -70,14 +70,18 @@ func (z *ZabbixApi) Logout() {
 	postBody, _ := json.Marshal(data2)
 	responseBody := bytes.NewBuffer(postBody)
 	_, err := http.Post(z.url, "application/json", responseBody)
-	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
-	}
+	return err
 	//body, err := ioutil.ReadAll(resp.Body)
 	//fmt.Println(string(body))
 }
 
-func (z *ZabbixApi) LaunchControls() [][]string {
+func (z *ZabbixApi) FailedResultControls(err error) (reportTable [][]string) {
+	reportTable = append(reportTable, []string{"API", "Problem"})
+	reportTable = append(reportTable, []string{z.url, "<span style=\"color:red\">" + err.Error() + "</span"})
+	return
+}
+
+func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 	red := color.New(color.FgRed, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
 	since := strconv.FormatInt(time.Now().Add(time.Duration(-z.since*int(time.Second))).Unix(), 10)
@@ -99,25 +103,15 @@ func (z *ZabbixApi) LaunchControls() [][]string {
 	resp, err := http.Post(z.url, "application/json", bytes.NewBuffer(enc))
 	//Handle Error
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		return
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	var obj map[string]interface{}
 	json.Unmarshal(body, &obj)
 
-	//prettyPrint, _ := json.MarshalIndent(obj, "    ", "  ")
-	// fmt.Println(string(prettyPrint))
-	// fmt.Println(resp.StatusCode)
-
 	var resultProblems zbxResultProblem
 	json.Unmarshal(body, &resultProblems)
 
-	// nbCfg := len(resultProblems.Result)
-	// t := doc.NewTable(nbCfg, 3)
-	// t.SetTitle(0, "Problem")
-	// t.SetTitle(1, "Severity")
-	// t.SetTitle(2, "...")
-	var reportTable [][]string
 	reportTable = append(reportTable, []string{"Problem", "Severity", "Comment"})
 	idx := 0
 
@@ -127,16 +121,15 @@ func (z *ZabbixApi) LaunchControls() [][]string {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
 		if pbSeverity >= z.severityThreshold {
-			red.Printf("Problem : %s\n", pb.Name, pb.Severity, "")
-			red.Printf("Severity: %s\n", pb.Name, pb.Severity, "")
+			red.Printf("Problem : %s\n", pb.Name)
+			red.Printf("Severity: %s\n", pb.Severity)
 			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:red\">ERR</span>"})
 		} else {
-			green.Printf("Problem : %s\n", pb.Name, pb.Severity, "")
-			green.Printf("Severity: %s\n", pb.Name, pb.Severity, "")
+			green.Printf("Problem : %s\n", pb.Name)
+			green.Printf("Severity: %s\n", pb.Severity)
 			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:green\">OK</span>"})
 		}
 		idx++
 	}
-
-	return reportTable
+	return
 }
