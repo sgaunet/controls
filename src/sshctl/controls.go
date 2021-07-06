@@ -80,7 +80,6 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH) [][]str
 			var newOutput string
 			session, err := connection.NewSession()
 			if err != nil {
-				// fmt.Printf("Failed to create session: %s\n", err)
 				sshControl.SetOutput("Failed to create session", false)
 				red.Printf("Host : %30s      -- Failed to create session\n", server.Host)
 				resultTable = append(resultTable, sshControl.GetResultLine())
