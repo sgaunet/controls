@@ -3,15 +3,18 @@ package sshctl
 import "github.com/fatih/color"
 
 func (c *sshControl) SetOutput(output string, passed bool) {
-	if passed {
-		c.output = "<span style=\"color:green\">" + output + "</span>"
-	} else {
-		c.output = "<span style=\"color:red\">" + output + "</span>"
-	}
+	c.passed = passed
+	c.output = output
 }
 
 func (c *sshControl) GetResultLine() []string {
-	return []string{c.server, EscapeForMarkdown(c.cmd), EscapeForMarkdown(c.expectedResult), EscapeForMarkdown(c.output)}
+	var result string
+	if c.passed {
+		result = "<span style=\"color:green\">" + c.output + "</span>"
+	} else {
+		result = "<span style=\"color:red\">" + c.output + "</span>"
+	}
+	return []string{c.server, EscapeForMarkdown(c.cmd), EscapeForMarkdown(c.expectedResult), EscapeForMarkdown(result)}
 }
 
 func (c *sshControl) PrintToStdout() {
