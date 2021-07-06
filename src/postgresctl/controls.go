@@ -9,10 +9,26 @@ import (
 	"github.com/fatih/color"
 )
 
+func (db *PostgresDB) PrintFailedCnx() {
+	red := color.New(color.FgRed, color.Bold)
+	red.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
+	red.Println("Nb cnx     : Connection error")
+	red.Println("Nb Max cnx : Connection error")
+	red.Println("Size (Go)  : Connection error")
+	red.Println("Result     : Connection error")
+}
+
+func (db *PostgresDB) PrintResult() {
+	green := color.New(color.FgGreen, color.Bold)
+	green.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
+	green.Printf("Nb cnx     : %d\n", db.NbUsedConnections)
+	green.Printf("Nb Max cnx : %d\n", db.NbMaxConnections)
+	green.Printf("Size (Go)  : %d\n", db.Size/1024/1024/1024)
+	green.Println("Result     : OK")
+}
+
 func LaunchControls(cfgdbs []config.DbConfig) [][]string {
 	var resultTable [][]string
-	red := color.New(color.FgRed, color.Bold)
-	green := color.New(color.FgGreen, color.Bold)
 	resultTable = append(resultTable, []string{"DB", "Nb cnx", "Nb Max Cnx", "Size (Go)", "Result"})
 
 	idx := 0
@@ -24,15 +40,13 @@ func LaunchControls(cfgdbs []config.DbConfig) [][]string {
 		defer onedb.Close()
 
 		if err != nil {
-			comment := "Erreur de connexion du serveur "
-			red.Printf("%30s | %10s | %10s | %10s | %40s |\n", strings.Split(onedb.Cfg.Dbhost, ".")[0], "N/A", "N/A", "N/A", comment)
-			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], "N/A", "N/A", "N/A", "<span style=\"color:red\">" + comment + "</span>"})
+			onedb.PrintFailedCnx()
+			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], "N/A", "N/A", "N/A", "<span style=\"color:red\">Connection error</span>"})
 		} else {
 			onedb.CalcDatabaseSize()
 			onedb.CalcCnx()
-			comment := "OK"
-			green.Printf("%30s | %10d | %10d | %10d | %40s |\n", strings.Split(onedb.Cfg.Dbhost, ".")[0], onedb.NbUsedConnections, onedb.NbMaxConnections, onedb.Size/1024/1024/1024, comment)
-			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], fmt.Sprintf("%d", onedb.NbUsedConnections), fmt.Sprintf("%d", onedb.NbMaxConnections), fmt.Sprintf("%d", onedb.Size/1024/1024/1024), "<span style=\"color:green\">" + comment + "</span>"})
+			onedb.PrintResult()
+			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], fmt.Sprintf("%d", onedb.NbUsedConnections), fmt.Sprintf("%d", onedb.NbMaxConnections), fmt.Sprintf("%d", onedb.Size/1024/1024/1024), "<span style=\"color:green\">OK</span>"})
 		}
 		idx++
 	}
