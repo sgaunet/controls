@@ -19,16 +19,12 @@ func (r *reportMd) AddTable(title string, table [][]string) {
 		nbColumns = len(table[0])
 	}
 
-	//fmt.Println("Table ", nbRows, nbColumns)
 	t := doc.NewTable(nbRows, nbColumns)
 	for idx, line := range table {
-		//fmt.Println("line=", line)
 		for idxRow, value := range line {
 			if idx == 0 {
 				t.SetTitle(idxRow, line[idxRow])
-				//fmt.Println("SetTitle", idxRow, line[idxRow])
 			} else {
-				//fmt.Println(idxRow, value)
 				t.SetContent(idx, idxRow, value)
 			}
 		}
@@ -58,7 +54,7 @@ func (r *reportMd) Export(reportpath string) error {
 func (r *reportMd) AddFooter() {
 	r.report.WriteTitle("Infos", 2)
 	r.report.WriteLines(1)
-	r.report.Write("Generated at :" + time.Now().String() + "<br>")
+	r.report.Write("Generated at :" + time.Now().Format("02-Jan-2006 15:04:05") + "<br>")
 }
 
 func (r *reportMd) AddPAgeBreak() {
