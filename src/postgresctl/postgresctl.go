@@ -23,7 +23,6 @@ func (db *PostgresDB) Connect() (err error) {
 	return err
 }
 
-// Close closes connection to PostgresDB
 func (db *PostgresDB) GetDbHost() string {
 	return db.Cfg.Dbhost
 }
@@ -39,10 +38,7 @@ func (db *PostgresDB) CheckConn() bool {
 		return false
 	}
 	err := db.Conn.Ping()
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (db *PostgresDB) CalcDatabaseSize() (err error) {
@@ -55,7 +51,6 @@ func (db *PostgresDB) CalcDatabaseSize() (err error) {
 
 	defer rows.Close()
 	for rows.Next() {
-
 		err = rows.Scan(&db.Size)
 		if err != nil {
 			return err
@@ -87,7 +82,6 @@ func (db *PostgresDB) CalcCnx() (err error) {
 	}
 	// get any error encountered during iteration
 	err = rows.Err()
-
 	return err
 }
 
@@ -101,7 +95,6 @@ func (db *PostgresDB) CollectInfos() (err error) {
 			return err
 		}
 	}
-
 	err = db.CalcDatabaseSize()
 	if err != nil {
 		return err
