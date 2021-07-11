@@ -40,16 +40,29 @@ func initTrace(debugLevel string) {
 	}
 }
 
+var version string
+
+func printVersion() {
+	fmt.Println(version)
+}
+
 func main() {
 	var configFile string
 	var reportPath string
 	var debugLevel string
+	var vOption bool
 	flag.StringVar(&configFile, "f", "", "YAML file to parse.")
 	flag.StringVar(&reportPath, "o", "", "Report tot create (md format")
 	flag.StringVar(&debugLevel, "d", "debug", "Debug level (info,warn,debug)")
+	flag.BoolVar(&vOption, "v", false, "Get version")
 	flag.Parse()
 
 	initTrace(debugLevel)
+
+	if vOption {
+		printVersion()
+		os.Exit(0)
+	}
 
 	if len(reportPath) == 0 {
 		flag.PrintDefaults()
