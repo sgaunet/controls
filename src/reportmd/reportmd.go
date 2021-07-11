@@ -2,6 +2,7 @@ package reportmd
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/atsushinee/go-markdown-generator/doc"
@@ -55,6 +56,10 @@ func (r *reportMd) AddFooter() {
 	r.report.WriteTitle("Infos", 2)
 	r.report.WriteLines(1)
 	r.report.Write("Generated at :" + time.Now().Format("02-Jan-2006 15:04:05") + "<br>")
+	hostname, err := os.Hostname()
+	if err == nil {
+		r.report.Write("Generated on :" + hostname + "<br>")
+	}
 }
 
 func (r *reportMd) AddPAgeBreak() {
