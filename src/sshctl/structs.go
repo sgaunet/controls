@@ -5,7 +5,7 @@ import (
 )
 
 type Server struct {
-	Cfg config.Servers
+	Cfg config.SSHServer
 }
 
 type sshControl struct {

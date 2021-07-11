@@ -3,7 +3,7 @@ package config
 // Struct representing the yaml configuration file passed as a parameter to the program
 type YamlConfig struct {
 	Db          []DbConfig             `yaml:"db"`
-	SshServers  map[string][]Servers   `yaml:"sshServers"`
+	SshServers  map[string][]SSHServer `yaml:"sshServers"`
 	SshAsserts  map[string][]AssertSSH `yaml:"sshAsserts"`
 	AssertsHTTP []AssertHTTP           `yaml:"assertsHTTP"`
 	ZbxCtl      ZbxCtl                 `yaml:"zbxCtl"`
@@ -29,7 +29,7 @@ type DbConfig struct {
 }
 
 // Struct representing the connection to an SSH Server
-type Servers struct {
+type SSHServer struct {
 	Host     string `yaml:"host"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`

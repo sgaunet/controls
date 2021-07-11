@@ -29,7 +29,7 @@ func EscapeForMarkdown(str string) string {
 	return strings.ReplaceAll(tmp, "|", "\\|")
 }
 
-func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH) [][]string {
+func LaunchControls(cfgSrv []config.SSHServer, asserts []config.AssertSSH) [][]string {
 	red := color.New(color.FgRed, color.Bold)
 	resultTable := [][]string{{"Host", "Cmd", "Expected Result", "Result"}}
 
@@ -61,7 +61,7 @@ func LaunchControls(cfgSrv []config.Servers, asserts []config.AssertSSH) [][]str
 			}
 		}
 
-		connection, err := ssh.Dial("tcp", server.Host+":22", &sshConfig)
+		connection, err := ssh.Dial("tcp", server.Host, &sshConfig)
 		if err != nil {
 			for _, control := range asserts {
 				red.Printf("Host : %30s      -- Failed to connect\n", server.Host)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"sgaunet/controls/config"
 	"sgaunet/controls/httpctl"
 	"sgaunet/controls/postgresctl"
 	"sgaunet/controls/reportmd"
@@ -60,7 +61,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	configApp, err := ReadyamlConfigFile(configFile)
+	configApp, err := config.ReadyamlConfigFile(configFile)
 	if err != nil {
 		os.Exit(1)
 	}
