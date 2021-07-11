@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"sgaunet/controls/config"
+	"sgaunet/controls/sshserver"
 
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
@@ -29,7 +30,7 @@ func EscapeForMarkdown(str string) string {
 	return strings.ReplaceAll(tmp, "|", "\\|")
 }
 
-func LaunchControls(cfgSrv []config.SSHServer, asserts []config.AssertSSH) [][]string {
+func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []config.AssertSSH) [][]string {
 	red := color.New(color.FgRed, color.Bold)
 	resultTable := [][]string{{"Host", "Cmd", "Expected Result", "Result"}}
 

@@ -1,12 +1,14 @@
 package config
 
+import "sgaunet/controls/sshserver"
+
 // Struct representing the yaml configuration file passed as a parameter to the program
 type YamlConfig struct {
-	Db          []DbConfig             `yaml:"db"`
-	SshServers  map[string][]SSHServer `yaml:"sshServers"`
-	SshAsserts  map[string][]AssertSSH `yaml:"sshAsserts"`
-	AssertsHTTP []AssertHTTP           `yaml:"assertsHTTP"`
-	ZbxCtl      ZbxCtl                 `yaml:"zbxCtl"`
+	Db          []DbConfig                       `yaml:"db"`
+	SshServers  map[string][]sshserver.SSHServer `yaml:"sshServers"`
+	SshAsserts  map[string][]AssertSSH           `yaml:"sshAsserts"`
+	AssertsHTTP []AssertHTTP                     `yaml:"assertsHTTP"`
+	ZbxCtl      ZbxCtl                           `yaml:"zbxCtl"`
 }
 
 // Struct to represent the informations to connect to the Zabbix API
@@ -26,14 +28,6 @@ type DbConfig struct {
 	Dbpassword  string `yaml:"dbpassword"`
 	Dbname      string `yaml:"dbname"`
 	Dbsizelimit int    `yaml:"sizelimit"`
-}
-
-// Struct representing the connection to an SSH Server
-type SSHServer struct {
-	Host     string `yaml:"host"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Sshkey   string `yaml:"sshkey"`
 }
 
 //Struct representing an SSH assertion

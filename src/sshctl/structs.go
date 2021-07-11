@@ -1,11 +1,9 @@
 package sshctl
 
-import (
-	"sgaunet/controls/config"
-)
+import "sgaunet/controls/sshserver"
 
 type Server struct {
-	Cfg config.SSHServer
+	Cfg sshserver.SSHServer
 }
 
 type sshControl struct {
