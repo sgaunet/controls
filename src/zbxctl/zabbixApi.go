@@ -1,4 +1,4 @@
-package zabbixapi
+package zbxctl
 
 import (
 	"bytes"

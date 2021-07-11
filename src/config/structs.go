@@ -1,6 +1,9 @@
 package config
 
-import "sgaunet/controls/sshserver"
+import (
+	"sgaunet/controls/sshserver"
+	"sgaunet/controls/zbxctl"
+)
 
 // Struct representing the yaml configuration file passed as a parameter to the program
 type YamlConfig struct {
@@ -8,16 +11,7 @@ type YamlConfig struct {
 	SshServers  map[string][]sshserver.SSHServer `yaml:"sshServers"`
 	SshAsserts  map[string][]AssertSSH           `yaml:"sshAsserts"`
 	AssertsHTTP []AssertHTTP                     `yaml:"assertsHTTP"`
-	ZbxCtl      ZbxCtl                           `yaml:"zbxCtl"`
-}
-
-// Struct to represent the informations to connect to the Zabbix API
-type ZbxCtl struct {
-	ApiEndpoint       string `yaml:"apiEndpoint"`
-	User              string `yaml:"user"`
-	Password          string `yaml:"password"`
-	Since             int    `yaml:"since"`
-	SeverityThreshold int    `yaml:"severityThreshold"`
+	ZbxCtl      zbxctl.ZbxCtl                    `yaml:"zbxCtl"`
 }
 
 // Struct representing the connection to a postgres Database

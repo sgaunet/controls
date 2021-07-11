@@ -1,4 +1,4 @@
-package zabbixapi
+package zbxctl
 
 type ZabbixApi struct {
 	auth              string

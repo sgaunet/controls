@@ -10,7 +10,7 @@ import (
 	"sgaunet/controls/postgresctl"
 	"sgaunet/controls/reportmd"
 	"sgaunet/controls/sshctl"
-	zabbixapi "sgaunet/controls/zabbixApi"
+	zbxctl "sgaunet/controls/zbxctl"
 
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
@@ -107,7 +107,7 @@ func main() {
 		r.AddSection("Zabbix controls")
 		fmt.Println()
 
-		z, err := zabbixapi.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
+		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Cannot login into zabbix API")
 			r.AddTable("", z.FailedResultControls(err))
