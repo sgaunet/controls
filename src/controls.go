@@ -126,7 +126,6 @@ func main() {
 			r.AddTable("", z.FailedResultControls(err))
 		} else {
 			defer z.Logout()
-			r.AddSection("Zabbix controls")
 			res, err := z.LaunchControls()
 			if err == nil {
 				r.AddTable("", res)
