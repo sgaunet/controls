@@ -112,7 +112,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 	var resultProblems zbxResultProblem
 	json.Unmarshal(body, &resultProblems)
 
-	reportTable = append(reportTable, []string{"Problem", "Severity", "Comment"})
+	reportTable = append(reportTable, []string{"Problem", "Severity"})
 	idx := 0
 
 	for _, pb := range resultProblems.Result {
