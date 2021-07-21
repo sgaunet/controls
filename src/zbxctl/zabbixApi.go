@@ -112,7 +112,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 	var resultProblems zbxResultProblem
 	json.Unmarshal(body, &resultProblems)
 
-	reportTable = append(reportTable, []string{"Problem", "Severity"})
+	reportTable = append(reportTable, []string{"Problem", "Severity", "Result"})
 	idx := 0
 
 	for _, pb := range resultProblems.Result {
@@ -123,7 +123,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 		if pbSeverity >= z.severityThreshold {
 			red.Printf("Problem : %s\n", pb.Name)
 			red.Printf("Severity: %s\n", pb.Severity)
-			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:red\">ERR</span>"})
+			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:red\">Error</span>"})
 		} else {
 			green.Printf("Problem : %s\n", pb.Name)
 			green.Printf("Severity: %s\n", pb.Severity)
