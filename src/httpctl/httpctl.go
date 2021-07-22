@@ -16,7 +16,14 @@ func (c *httpControl) GetResultLine() []string {
 	} else {
 		statusCode = "<span style=\"color:red\">" + c.statusCode + "</span>"
 	}
-	return []string{c.url, statusCode, c.comment}
+
+	if len(c.url) > 70 {
+		c.url = c.url[:65] + "..."
+	}
+	if len(c.hostHeader) == 0 {
+		c.hostHeader = "N/A"
+	}
+	return []string{c.url, c.hostHeader, statusCode}
 }
 
 func (c *httpControl) PrintToStdout() {
@@ -28,8 +35,8 @@ func (c *httpControl) PrintToStdout() {
 	}
 
 	std.Printf("URL        : %s\n", c.url)
+	std.Printf("HostHeader : %s\n", c.hostHeader)
 	std.Printf("StatusCode : %s\n", c.statusCode)
-	std.Printf("Comment    : %s\n", c.comment)
 }
 
 func (c *httpControl) ctlHTTP(assertHTTP config.AssertHTTP) []string {
@@ -66,14 +73,13 @@ func (c *httpControl) ctlHTTP(assertHTTP config.AssertHTTP) []string {
 }
 
 func LaunchControls(asserts []config.AssertHTTP) [][]string {
-	resultTable := [][]string{{"URL", "Http StatusCode", "Comment"}}
+	resultTable := [][]string{{"URL", "HostHeader", "StatusCode"}}
 
 	idx := 0
 	for _, assert := range asserts {
 		newHttpControl := httpControl{
 			hostHeader: assert.HostHeader,
 			url:        assert.Host,
-			comment:    assert.Comment,
 		}
 		resultTable = append(resultTable, newHttpControl.ctlHTTP(assert))
 		newHttpControl.PrintToStdout()
