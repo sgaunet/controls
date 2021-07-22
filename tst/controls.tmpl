@@ -1,3 +1,11 @@
+db:
+  - dbhost: localhost
+    dbuser: zabbix
+    dbpassword: zabbix_local
+    dbport: 15432
+    dbname: zabbix_local
+    sizelimit: 400    # Go
+
 sshAsserts:
   GROUP1:
     - cmd: "systemctl status ntpd > /dev/null 2>&1; echo $?"
