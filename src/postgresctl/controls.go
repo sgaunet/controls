@@ -18,13 +18,18 @@ func (db *PostgresDB) PrintFailedCnx() {
 	red.Println("Result     : Connection error")
 }
 
-func (db *PostgresDB) PrintResult() {
-	green := color.New(color.FgGreen, color.Bold)
-	green.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
-	green.Printf("Nb cnx     : %d\n", db.NbUsedConnections)
-	green.Printf("Nb Max cnx : %d\n", db.NbMaxConnections)
-	green.Printf("Size (Go)  : %d\n", db.Size/1024/1024/1024)
-	green.Println("Result     : OK")
+func (db *PostgresDB) PrintResult(msg string, testPassed bool) {
+	var std *color.Color
+	if testPassed {
+		std = color.New(color.FgGreen, color.Bold)
+	} else {
+		std = color.New(color.FgRed, color.Bold)
+	}
+	std.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
+	std.Printf("Nb cnx     : %d\n", db.NbUsedConnections)
+	std.Printf("Nb Max cnx : %d\n", db.NbMaxConnections)
+	std.Printf("Size (Go)  : %d\n", db.Size/1024/1024/1024)
+	std.Printf("Result     : %s\n", msg)
 }
 
 func LaunchControls(cfgdbs []config.DbConfig) [][]string {
@@ -43,10 +48,26 @@ func LaunchControls(cfgdbs []config.DbConfig) [][]string {
 			onedb.PrintFailedCnx()
 			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], "N/A", "N/A", "N/A", "<span style=\"color:red\">Connection error</span>"})
 		} else {
+			msg := "<span style=\"color:green\">OK</span>"
+			msgStdout := "OK"
+			testPassed := true
+
 			onedb.CalcDatabaseSize()
 			onedb.CalcCnx()
-			onedb.PrintResult()
-			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], fmt.Sprintf("%d", onedb.NbUsedConnections), fmt.Sprintf("%d", onedb.NbMaxConnections), fmt.Sprintf("%d", onedb.Size/1024/1024/1024), "<span style=\"color:green\">OK</span>"})
+
+			size := onedb.Size / 1024 / 1024 / 1024
+			if size > onedb.Size {
+				msg = "<span style=\"color:red\">Size limit reached</span>"
+				msgStdout = "Size limit reached"
+				testPassed = false
+			}
+			if onedb.NbUsedConnections == onedb.NbMaxConnections {
+				msg = "<span style=\"color:red\">Size limit reached</span>"
+				msgStdout = "Size limit reached"
+				testPassed = false
+			}
+			onedb.PrintResult(msgStdout, testPassed)
+			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], fmt.Sprintf("%d", onedb.NbUsedConnections), fmt.Sprintf("%d", onedb.NbMaxConnections), fmt.Sprintf("%d", size), msg})
 		}
 		idx++
 	}
