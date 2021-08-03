@@ -62,6 +62,7 @@ sshServers:
 assertsHTTP:
   - host: http://internal-e2734db1-foo-bar-66vy-345675678.eu-west-3.elb.amazonaws.com
     hostheader: real.dns.fr
+    comment: Internal check (internal Load Balancer)
 
 zbxCtl:
   apiEndpoint: "http://zbx.mysociety.local/api_jsonrpc.php"

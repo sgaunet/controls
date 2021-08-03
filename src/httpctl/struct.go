@@ -5,6 +5,7 @@ type httpControl struct {
 	hostHeader string
 	statusCode string
 	passed     bool
+	comment    string
 }
 
 //Struct representing an HTTP assertion

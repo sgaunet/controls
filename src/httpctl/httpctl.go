@@ -21,7 +21,7 @@ func (c *httpControl) GetResultLine() []string {
 	if len(c.hostHeader) == 0 {
 		c.hostHeader = "N/A"
 	}
-	return []string{c.url, c.hostHeader, statusCode}
+	return []string{c.url, c.hostHeader, statusCode, c.comment}
 }
 
 func (c *httpControl) PrintToStdout() {
@@ -35,6 +35,7 @@ func (c *httpControl) PrintToStdout() {
 	std.Printf("URL        : %s\n", c.url)
 	std.Printf("HostHeader : %s\n", c.hostHeader)
 	std.Printf("StatusCode : %s\n", c.statusCode)
+	std.Printf("Comment : %s\n", c.comment)
 }
 
 func (c *httpControl) ctlHTTP(assertHTTP AssertHTTP) []string {
@@ -71,13 +72,14 @@ func (c *httpControl) ctlHTTP(assertHTTP AssertHTTP) []string {
 }
 
 func LaunchControls(asserts []AssertHTTP) [][]string {
-	resultTable := [][]string{{"URL", "HostHeader", "StatusCode"}}
+	resultTable := [][]string{{"URL", "HostHeader", "StatusCode", "Comment"}}
 
 	idx := 0
 	for _, assert := range asserts {
 		newHttpControl := httpControl{
 			hostHeader: assert.HostHeader,
 			url:        assert.Host,
+			comment:    assert.Comment,
 		}
 		resultTable = append(resultTable, newHttpControl.ctlHTTP(assert))
 		newHttpControl.PrintToStdout()
