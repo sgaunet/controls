@@ -13,3 +13,9 @@ type sshControl struct {
 	expectedResult string
 	passed         bool
 }
+
+//Struct representing an SSH assertion
+type AssertSSH struct {
+	Cmd            string `yaml:"cmd"`
+	ExpectedResult string `yaml:"expected"`
+}

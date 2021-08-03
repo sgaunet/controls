@@ -2,12 +2,10 @@ package postgresctl
 
 import (
 	"database/sql"
-
-	"sgaunet/controls/config"
 )
 
 type PostgresDB struct {
-	Cfg  config.DbConfig
+	Cfg  DbConfig
 	Conn *sql.DB
 	Size int
 
@@ -15,4 +13,14 @@ type PostgresDB struct {
 	NbUsedConnections       int
 	NbReservedForSuperUser  int
 	NbReservedForNormalUser int
+}
+
+// Struct representing the connection to a postgres Database
+type DbConfig struct {
+	Dbhost      string `yaml:"dbhost"`
+	Dbport      string `yaml:"dbport"`
+	Dbuser      string `yaml:"dbuser"`
+	Dbpassword  string `yaml:"dbpassword"`
+	Dbname      string `yaml:"dbname"`
+	Dbsizelimit int    `yaml:"sizelimit"`
 }

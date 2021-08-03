@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"sgaunet/controls/config"
-
 	"github.com/fatih/color"
 )
 
@@ -32,7 +30,7 @@ func (db *PostgresDB) PrintResult(msg string, testPassed bool) {
 	std.Printf("Result     : %s\n", msg)
 }
 
-func LaunchControls(cfgdbs []config.DbConfig) [][]string {
+func LaunchControls(cfgdbs []DbConfig) [][]string {
 	var resultTable [][]string
 	resultTable = append(resultTable, []string{"DB", "Nb cnx", "Nb Max Cnx", "Size (Go)", "Result"})
 

@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"sgaunet/controls/config"
-
 	"github.com/fatih/color"
 )
 
@@ -39,7 +37,7 @@ func (c *httpControl) PrintToStdout() {
 	std.Printf("StatusCode : %s\n", c.statusCode)
 }
 
-func (c *httpControl) ctlHTTP(assertHTTP config.AssertHTTP) []string {
+func (c *httpControl) ctlHTTP(assertHTTP AssertHTTP) []string {
 	req, err := http.NewRequest("GET", assertHTTP.Host, nil)
 	if err != nil {
 		c.statusCode = err.Error()
@@ -72,7 +70,7 @@ func (c *httpControl) ctlHTTP(assertHTTP config.AssertHTTP) []string {
 	return c.GetResultLine()
 }
 
-func LaunchControls(asserts []config.AssertHTTP) [][]string {
+func LaunchControls(asserts []AssertHTTP) [][]string {
 	resultTable := [][]string{{"URL", "HostHeader", "StatusCode"}}
 
 	idx := 0
