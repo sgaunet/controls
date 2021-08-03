@@ -47,9 +47,8 @@ func New(login string, password string, url string, sinceMs int, severityThresho
 	var zbxResp zbxLoginReturn
 	err = json.Unmarshal(body, &zbxResp)
 	if err != nil {
-		fmt.Printf("Error : %s %d %s\n", zbxResp.Result, resp.StatusCode, string(body))
-		fmt.Fprintln(os.Stderr, err.Error())
-		return z, err
+		fmt.Printf("Error : %s %d %s\n", zbxResp.Result, resp.StatusCode, "cannot login to zabbix API")
+		return z, errors.New("cannot login to zabbix API")
 	}
 	if len(zbxResp.Result) == 0 {
 		return z, errors.New("cannot login to zabbix API")
@@ -77,7 +76,7 @@ func (z *ZabbixApi) Logout() error {
 
 func (z *ZabbixApi) FailedResultControls(err error) (reportTable [][]string) {
 	reportTable = append(reportTable, []string{"API", "Problem"})
-	reportTable = append(reportTable, []string{z.url, "<span style=\"color:red\">" + err.Error() + "</span"})
+	reportTable = append(reportTable, []string{z.url, "<span style=\"color:red\">" + err.Error() + "</span>"})
 	return
 }
 
