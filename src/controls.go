@@ -40,7 +40,7 @@ func initTrace(debugLevel string) {
 	}
 }
 
-var version string
+var version string = "development"
 
 func printVersion() {
 	fmt.Println(version)
