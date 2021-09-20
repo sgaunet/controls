@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"sgaunet/controls/config"
-	"sgaunet/controls/httpctl"
-	"sgaunet/controls/postgresctl"
-	"sgaunet/controls/reportmd"
-	"sgaunet/controls/sshctl"
-	zbxctl "sgaunet/controls/zbxctl"
+	"github.com/sgaunet/controls/config"
+	"github.com/sgaunet/controls/httpctl"
+	"github.com/sgaunet/controls/postgresctl"
+	"github.com/sgaunet/controls/reportmd"
+	"github.com/sgaunet/controls/sshctl"
+	zbxctl "github.com/sgaunet/controls/zbxctl"
 
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"

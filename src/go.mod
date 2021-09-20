@@ -1,4 +1,4 @@
-module sgaunet/controls
+module github.com/sgaunet/controls
 
 go 1.16
 

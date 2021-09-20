@@ -1,11 +1,11 @@
 package config
 
 import (
-	"sgaunet/controls/httpctl"
-	"sgaunet/controls/postgresctl"
-	"sgaunet/controls/sshctl"
-	"sgaunet/controls/sshserver"
-	"sgaunet/controls/zbxctl"
+	"github.com/sgaunet/controls/httpctl"
+	"github.com/sgaunet/controls/postgresctl"
+	"github.com/sgaunet/controls/sshctl"
+	"github.com/sgaunet/controls/sshserver"
+	"github.com/sgaunet/controls/zbxctl"
 )
 
 // Struct representing the yaml configuration file passed as a parameter to the program

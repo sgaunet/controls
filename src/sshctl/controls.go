@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"sgaunet/controls/sshserver"
+	"github.com/sgaunet/controls/sshserver"
 
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
