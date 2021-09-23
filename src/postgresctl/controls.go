@@ -2,51 +2,26 @@ package postgresctl
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/fatih/color"
 	"github.com/sgaunet/controls/results"
 )
 
-func (db *PostgresDB) PrintFailedCnx() {
-	red := color.New(color.FgRed, color.Bold)
-	red.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
-	red.Println("Nb cnx     : Connection error")
-	red.Println("Nb Max cnx : Connection error")
-	red.Println("Size (Go)  : Connection error")
-	red.Println("Result     : Connection error")
-}
-
-func (db *PostgresDB) PrintResult(msg string, testPassed bool) {
-	var std *color.Color
-	if testPassed {
-		std = color.New(color.FgGreen, color.Bold)
-	} else {
-		std = color.New(color.FgRed, color.Bold)
-	}
-	std.Printf("DB Host    : %s\n", strings.Split(db.Cfg.Dbhost, ".")[0])
-	std.Printf("Nb cnx     : %d\n", db.NbUsedConnections)
-	std.Printf("Nb Max cnx : %d\n", db.NbMaxConnections)
-	std.Printf("Size (Go)  : %d\n", db.Size/1024/1024/1024)
-	std.Printf("Result     : %s\n", msg)
-}
-
 func (db *PostgresDB) resultsWhenErrCnx() (resultTable []results.Result) {
-	result := results.Result{
-		Title:  fmt.Sprintf("DB Size (%s)", db.Cfg.Dbhost),
-		Result: "Connection error",
-		Pass:   false,
+	msgErr := "Connection error"
+
+	tests := []string{
+		fmt.Sprintf("Nb cnx (%s)", db.Cfg.Dbhost),
+		fmt.Sprintf("Nb MAX cnx (%s)", db.Cfg.Dbhost),
 	}
-	result.PrintToStdout()
-	resultTable = append(resultTable, result)
-
-	result.Title = fmt.Sprintf("Nb cnx (%s)", db.Cfg.Dbhost)
-	result.PrintToStdout()
-	resultTable = append(resultTable, result)
-
-	result.Title = fmt.Sprintf("Nb MAX cnx (%s)", db.Cfg.Dbhost)
-	result.PrintToStdout()
-	resultTable = append(resultTable, result)
+	for _, t := range tests {
+		result := results.Result{
+			Title:  t,
+			Result: msgErr,
+			Pass:   false,
+		}
+		resultTable = append(resultTable, result)
+		result.PrintToStdout()
+	}
 	return
 }
 
@@ -62,19 +37,21 @@ func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
 		defer onedb.Close()
 
 		if err != nil {
+			// Cannot connect to DB so
+			// init all resultTable with failed results
 			for _, r := range onedb.resultsWhenErrCnx() {
 				resultTable = append(resultTable, r)
 			}
-
 		} else {
+			// Connexion to DB is ok
 			onedb.CalcDatabaseSize()
 			onedb.CalcCnx()
 			// Convert size to Go
 			size := onedb.Size / 1024 / 1024 / 1024
 
-			if size > onedb.Size {
+			if onedb.Size > onedb.Cfg.Dbsizelimit {
 				result := results.Result{
-					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Size),
+					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
 					Result: fmt.Sprintf("%d Go", size),
 					Pass:   false,
 				}
@@ -83,7 +60,7 @@ func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
 
 			} else {
 				result := results.Result{
-					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Size),
+					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
 					Result: fmt.Sprintf("%d Go", size),
 					Pass:   true,
 				}
