@@ -2,47 +2,19 @@ package httpctl
 
 import (
 	"net/http"
-	"strconv"
 
-	"github.com/fatih/color"
+	"github.com/sgaunet/controls/results"
 )
 
-func (c *httpControl) GetResultLine() []string {
-	var statusCode string
-	if c.passed {
-		statusCode = "<span style=\"color:green\">" + c.statusCode + "</span>"
-	} else {
-		statusCode = "<span style=\"color:red\">" + c.statusCode + "</span>"
-	}
+func ctlHTTP(assertHTTP AssertHTTP) results.Result {
+	var r results.Result
+	r.Title = assertHTTP.Title
 
-	if len(c.url) > 70 {
-		c.url = c.url[:65] + "..."
-	}
-	if len(c.hostHeader) == 0 {
-		c.hostHeader = "N/A"
-	}
-	return []string{c.url, c.hostHeader, statusCode, c.comment}
-}
-
-func (c *httpControl) PrintToStdout() {
-	var std *color.Color
-	if c.passed {
-		std = color.New(color.FgGreen, color.Bold)
-	} else {
-		std = color.New(color.FgRed, color.Bold)
-	}
-
-	std.Printf("URL        : %s\n", c.url)
-	std.Printf("HostHeader : %s\n", c.hostHeader)
-	std.Printf("StatusCode : %s\n", c.statusCode)
-	std.Printf("Comment : %s\n", c.comment)
-}
-
-func (c *httpControl) ctlHTTP(assertHTTP AssertHTTP) []string {
 	req, err := http.NewRequest("GET", assertHTTP.Host, nil)
 	if err != nil {
-		c.statusCode = err.Error()
-		return c.GetResultLine()
+		//c.statusCode = err.Error()
+		r.Result = err.Error()
+		return r
 	}
 	if len(assertHTTP.HostHeader) != 0 {
 		req.Host = assertHTTP.HostHeader
@@ -54,35 +26,30 @@ func (c *httpControl) ctlHTTP(assertHTTP AssertHTTP) []string {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		c.statusCode = err.Error()
-		return c.GetResultLine()
+		r.Result = err.Error()
+		//c.statusCode = err.Error()
+		return r
 	}
 	// _, err := ioutil.ReadAll(resp.Body)
 	// if err != nil {
 	// 	fmt.Println("error", err.Error())
 	// }
 	//fmt.Println(resp.StatusCode)
-	c.statusCode = strconv.Itoa(resp.StatusCode)
+	// statusCode := strconv.Itoa(resp.StatusCode)
 	if resp.StatusCode >= 200 && resp.StatusCode < 400 {
-		c.passed = true
-	} else {
-		c.passed = false
+		r.Pass = true
 	}
-	return c.GetResultLine()
+
+	return r
 }
 
-func LaunchControls(asserts []AssertHTTP) [][]string {
-	resultTable := [][]string{{"URL", "HostHeader", "StatusCode", "Comment"}}
-
+func LaunchControls(asserts []AssertHTTP) (resultTable []results.Result) {
 	idx := 0
 	for _, assert := range asserts {
-		newHttpControl := httpControl{
-			hostHeader: assert.HostHeader,
-			url:        assert.Host,
-			comment:    assert.Comment,
-		}
-		resultTable = append(resultTable, newHttpControl.ctlHTTP(assert))
-		newHttpControl.PrintToStdout()
+		res := ctlHTTP(assert)
+		res.PrintToStdout()
+		resultTable = append(resultTable, res)
+		// newHttpControl.PrintToStdout()
 		idx++
 	}
 	return resultTable

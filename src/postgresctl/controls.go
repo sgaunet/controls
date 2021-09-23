@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/sgaunet/controls/results"
 )
 
 func (db *PostgresDB) PrintFailedCnx() {
@@ -30,9 +31,27 @@ func (db *PostgresDB) PrintResult(msg string, testPassed bool) {
 	std.Printf("Result     : %s\n", msg)
 }
 
-func LaunchControls(cfgdbs []DbConfig) [][]string {
-	var resultTable [][]string
-	resultTable = append(resultTable, []string{"DB", "Nb cnx", "Nb Max Cnx", "Size (Go)", "Result"})
+func (db *PostgresDB) resultsWhenErrCnx() (resultTable []results.Result) {
+	result := results.Result{
+		Title:  fmt.Sprintf("DB Size (%s)", db.Cfg.Dbhost),
+		Result: "Connection error",
+		Pass:   false,
+	}
+	result.PrintToStdout()
+	resultTable = append(resultTable, result)
+
+	result.Title = fmt.Sprintf("Nb cnx (%s)", db.Cfg.Dbhost)
+	result.PrintToStdout()
+	resultTable = append(resultTable, result)
+
+	result.Title = fmt.Sprintf("Nb MAX cnx (%s)", db.Cfg.Dbhost)
+	result.PrintToStdout()
+	resultTable = append(resultTable, result)
+	return
+}
+
+func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
+	//resultTable = append(resultTable, []string{"DB", "Nb cnx", "Nb Max Cnx", "Size (Go)", "Result"})
 
 	idx := 0
 	for _, db := range cfgdbs {
@@ -43,29 +62,58 @@ func LaunchControls(cfgdbs []DbConfig) [][]string {
 		defer onedb.Close()
 
 		if err != nil {
-			onedb.PrintFailedCnx()
-			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], "N/A", "N/A", "N/A", "<span style=\"color:red\">Connection error</span>"})
-		} else {
-			msg := "<span style=\"color:green\">OK</span>"
-			msgStdout := "OK"
-			testPassed := true
+			for _, r := range onedb.resultsWhenErrCnx() {
+				resultTable = append(resultTable, r)
+			}
 
+		} else {
 			onedb.CalcDatabaseSize()
 			onedb.CalcCnx()
-
+			// Convert size to Go
 			size := onedb.Size / 1024 / 1024 / 1024
+
 			if size > onedb.Size {
-				msg = "<span style=\"color:red\">Size limit reached</span>"
-				msgStdout = "Size limit reached"
-				testPassed = false
+				result := results.Result{
+					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Size),
+					Result: fmt.Sprintf("%d Go", size),
+					Pass:   false,
+				}
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
+
+			} else {
+				result := results.Result{
+					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Size),
+					Result: fmt.Sprintf("%d Go", size),
+					Pass:   true,
+				}
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
 			}
 			if onedb.NbUsedConnections == onedb.NbMaxConnections {
-				msg = "<span style=\"color:red\">Size limit reached</span>"
-				msgStdout = "Size limit reached"
-				testPassed = false
+				result := results.Result{
+					Result: "Nb used connections == Nb max connections",
+					Pass:   false,
+				}
+				result.Title = fmt.Sprintf("Nb connections (%s)", onedb.Cfg.Dbhost)
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
+				result.Title = fmt.Sprintf("Nb max connections (%s)", onedb.Cfg.Dbhost)
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
+			} else {
+				result := results.Result{
+					Result: fmt.Sprintf("%d", onedb.NbUsedConnections),
+					Pass:   true,
+				}
+				result.Title = fmt.Sprintf("Nb connections (%s)", onedb.Cfg.Dbhost)
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
+				result.Title = fmt.Sprintf("Nb max connections (%s)", onedb.Cfg.Dbhost)
+				result.Result = fmt.Sprintf("%d", onedb.NbMaxConnections)
+				result.PrintToStdout()
+				resultTable = append(resultTable, result)
 			}
-			onedb.PrintResult(msgStdout, testPassed)
-			resultTable = append(resultTable, []string{strings.Split(onedb.Cfg.Dbhost, ".")[0], fmt.Sprintf("%d", onedb.NbUsedConnections), fmt.Sprintf("%d", onedb.NbMaxConnections), fmt.Sprintf("%d", size), msg})
 		}
 		idx++
 	}

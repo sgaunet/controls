@@ -8,7 +8,7 @@ import (
 	"github.com/sgaunet/controls/config"
 	"github.com/sgaunet/controls/httpctl"
 	"github.com/sgaunet/controls/postgresctl"
-	"github.com/sgaunet/controls/reportmd"
+	"github.com/sgaunet/controls/reportpdf"
 	"github.com/sgaunet/controls/sshctl"
 	zbxctl "github.com/sgaunet/controls/zbxctl"
 
@@ -79,65 +79,67 @@ func main() {
 		os.Exit(1)
 	}
 
-	r := reportmd.New()
-	r.AddTitle("Controls")
+	//r := reportmd.New()
+	rPdf := reportpdf.New()
+	rPdf.AddTitle("Controls")
 
 	if len(configApp.Db) != 0 {
-		r.AddSection("Databases controls")
+		rPdf.AddSection("Databases controls")
 		//r.AddTable(toto)
-		r.AddTable("", postgresctl.LaunchControls(configApp.Db))
+		rPdf.AddTable("", postgresctl.LaunchControls(configApp.Db))
 	}
 
 	if len(configApp.SshServers) != 0 {
-		r.AddSection("SSH Asserts")
+		rPdf.AddLine()
+		rPdf.AddSection("SSH Asserts")
 		// Loop over group of servers
 		for serverGroupName, servers := range configApp.SshServers {
-
-			// fmt.Printf("\nSSH Asserts for group %s :\n\n", serverGroupName)
-			// report.WriteLines(1)
-			// report.WriteTitle("SSH asserts for group "+serverGroupName, 3)
-			// report.WriteLines(1)
-			// Loop over group of asserts
 			for assertsGroupName, asserts := range configApp.SshAsserts {
 				if serverGroupName == assertsGroupName {
-					r.AddTable("SSH asserts for group "+serverGroupName, sshctl.LaunchControls(servers, asserts))
+					rPdf.AddTable("SSH asserts for group "+serverGroupName, sshctl.LaunchControls(servers, asserts))
 					break
 				}
 			}
 		}
 	}
 	fmt.Println()
-	r.AddPAgeBreak()
+	//rPdf.AddPAgeBreak()
 
 	if len(configApp.AssertsHTTP) != 0 {
-		r.AddSection("HTTP controls")
-		r.AddTable("", httpctl.LaunchControls(configApp.AssertsHTTP))
+		rPdf.AddLine()
+		rPdf.AddSection("HTTP controls")
+		//r.AddTable("", httpctl.LaunchControls(configApp.AssertsHTTP))
+		results := httpctl.LaunchControls(configApp.AssertsHTTP)
+		rPdf.AddTable("HTTP", results)
 		fmt.Println()
 	}
 
 	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
-		r.AddPAgeBreak()
-		r.AddSection("Zabbix controls")
+		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
+		rPdf.AddLine()
+		rPdf.AddSection("Zabbix controls")
 		fmt.Println()
 
-		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Cannot login into zabbix API")
-			r.AddTable("", z.FailedResultControls(err))
+			rPdf.AddTable("", z.FailedResultControls(err))
 		} else {
 			defer z.Logout()
 			res, err := z.LaunchControls()
 			if err == nil {
-				r.AddTable("", res)
+				rPdf.AddTable("", res)
 			} else {
-				r.AddTable("", z.FailedResultControls(err))
+				rPdf.AddTable("", z.FailedResultControls(err))
 			}
 		}
 	}
 
-	r.AddFooter()
+	rPdf.AddLine()
+	//r.AddFooter()
+	rPdf.AddFooter()
+	err = rPdf.Export(reportPath)
 
-	err = r.Export(reportPath)
+	//err = r.Export(reportPath)
 	if err != nil {
 		log.Fatal(err)
 	}

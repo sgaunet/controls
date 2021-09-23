@@ -23,6 +23,7 @@ func (r *reportPdf) AddTable(title string, results []results.Result) {
 	redColor := getRedColor()
 	greenColor := getGreenColor()
 
+	r.AddSection(title)
 	var contents [][]string
 	header := []string{"Test", "Result"}
 
@@ -33,6 +34,9 @@ func (r *reportPdf) AddTable(title string, results []results.Result) {
 			contents = append(contents, []string{result.Title, result.Result})
 			allOk = false
 		}
+	}
+	if len(results) == 0 {
+		contents = append(contents, []string{"No problems to show", "ok"})
 	}
 
 	if allOk {
@@ -76,9 +80,27 @@ func (r *reportPdf) AddSection(title string) {
 				Top:   3,
 				Style: consts.Bold,
 				Align: consts.Left,
+				Size:  15.0,
 			})
 		})
 	})
+}
+
+func (r *reportPdf) AddSubSection(title string) {
+	r.report.Row(10, func() {
+		r.report.Col(12, func() {
+			r.report.Text(title, props.Text{
+				Top:   3,
+				Style: consts.Bold,
+				Align: consts.Left,
+				Size:  10.0,
+			})
+		})
+	})
+}
+
+func (r *reportPdf) AddLine() {
+	r.report.Line(10)
 }
 
 func (r *reportPdf) Export(reportpath string) error {

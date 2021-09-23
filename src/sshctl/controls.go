@@ -1,10 +1,12 @@
 package sshctl
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 	"time"
 
+	"github.com/sgaunet/controls/results"
 	"github.com/sgaunet/controls/sshserver"
 
 	"github.com/fatih/color"
@@ -29,10 +31,8 @@ func EscapeForMarkdown(str string) string {
 	return strings.ReplaceAll(tmp, "|", "\\|")
 }
 
-func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) [][]string {
+func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) (resultTable []results.Result) {
 	red := color.New(color.FgRed, color.Bold)
-	resultTable := [][]string{{"Host", "Cmd", "Expected Result", "Result"}}
-
 	idx := 0
 	for _, server := range cfgSrv {
 		var sshConfig ssh.ClientConfig
@@ -65,7 +65,11 @@ func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) [][]strin
 		if err != nil {
 			for _, control := range asserts {
 				red.Printf("Host : %30s      -- Failed to connect\n", server.Host)
-				resultTable = append(resultTable, []string{server.Host, EscapeForMarkdown(control.Cmd), "N/A", "<span style=\"color:red\">Failed to connect</span>"})
+				resultTable = append(resultTable, results.Result{
+					Title:  control.Title,
+					Result: "Failed to connect",
+					Pass:   false,
+				})
 				idx++
 			}
 			continue
@@ -73,25 +77,35 @@ func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) [][]strin
 		defer connection.Close()
 
 		for _, control := range asserts {
-			sshControl := sshControl{server: server.Host,
-				cmd:            control.Cmd,
-				expectedResult: control.ExpectedResult}
+			// sshControl := sshControl{server: server.Host,
+			// 	cmd:            control.Cmd,
+			// 	expectedResult: control.ExpectedResult}
 
 			var newOutput string
 			session, err := connection.NewSession()
 			if err != nil {
-				sshControl.SetOutput("Failed to create session", false)
-				red.Printf("Host : %30s      -- Failed to create session\n", server.Host)
-				resultTable = append(resultTable, sshControl.GetResultLine())
+				// sshControl.SetOutput("Failed to create session", false)
+				// red.Printf("Host : %30s      -- Failed to create session\n", server.Host)
+				r := results.Result{
+					Title:  fmt.Sprintf("%s (%s)", control.Title, server.Host),
+					Pass:   false,
+					Result: "Failed to create SSH session",
+				}
+				resultTable = append(resultTable, r)
+				r.PrintToStdout()
 				idx++
 				continue
 			}
 
 			output, err := session.CombinedOutput(control.Cmd)
 			if err != nil {
-				sshControl.SetOutput("Failed to use session", false)
-				red.Printf("Host : %30s      -- Failed to use session\n", server.Host)
-				resultTable = append(resultTable, sshControl.GetResultLine())
+				r := results.Result{
+					Title:  fmt.Sprintf("%s (%s)", control.Title, server.Host),
+					Pass:   false,
+					Result: "Failed to create SSH session",
+				}
+				resultTable = append(resultTable, r)
+				r.PrintToStdout()
 				continue
 			}
 			if len(output) != 0 {
@@ -100,15 +114,16 @@ func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) [][]strin
 			// session.Wait()
 			session.Close()
 
-			if control.ExpectedResult == newOutput {
-				sshControl.SetOutput(newOutput, true)
-				resultTable = append(resultTable, sshControl.GetResultLine())
-				sshControl.PrintToStdout()
-			} else {
-				sshControl.SetOutput(newOutput, false)
-				resultTable = append(resultTable, sshControl.GetResultLine())
-				sshControl.PrintToStdout()
+			r := results.Result{
+				Title:  fmt.Sprintf("%s (%s)", control.Title, server.Host),
+				Result: newOutput,
+				Pass:   control.ExpectedResult == newOutput,
 			}
+			if control.ExpectedResult != newOutput {
+				r.Result = fmt.Sprintf("Result : %s   Expected: %s", newOutput, control.ExpectedResult)
+			}
+			r.PrintToStdout()
+			resultTable = append(resultTable, r)
 			idx++
 		}
 	}

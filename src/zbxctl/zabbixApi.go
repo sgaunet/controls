@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fatih/color"
+	"github.com/sgaunet/controls/results"
 )
 
 func New(login string, password string, url string, sinceMs int, severityThreshold int) (ZabbixApi, error) {
@@ -74,15 +74,17 @@ func (z *ZabbixApi) Logout() error {
 	//fmt.Println(string(body))
 }
 
-func (z *ZabbixApi) FailedResultControls(err error) (reportTable [][]string) {
-	reportTable = append(reportTable, []string{"API", "Problem"})
-	reportTable = append(reportTable, []string{z.url, "<span style=\"color:red\">" + err.Error() + "</span>"})
+func (z *ZabbixApi) FailedResultControls(err error) (reportTable []results.Result) {
+	reportTable = append(reportTable, results.Result{
+		Title:  "API Access",
+		Result: err.Error(),
+		Pass:   false,
+	})
+	//reportTable = append(reportTable, []string{z.url, "<span style=\"color:red\">" + err.Error() + "</span>"})
 	return
 }
 
-func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
-	red := color.New(color.FgRed, color.Bold)
-	green := color.New(color.FgGreen, color.Bold)
+func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 	since := strconv.FormatInt(time.Now().Add(time.Duration(-z.since*int(time.Second))).Unix(), 10)
 
 	dataGetProblem := zbxGetProblem{
@@ -111,7 +113,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 	var resultProblems zbxResultProblem
 	json.Unmarshal(body, &resultProblems)
 
-	reportTable = append(reportTable, []string{"Problem", "Severity", "Result"})
+	// reportTable = append(reportTable, []string{"Problem", "Severity", "Result"})
 	idx := 0
 
 	for _, pb := range resultProblems.Result {
@@ -119,15 +121,12 @@ func (z *ZabbixApi) LaunchControls() (reportTable [][]string, err error) {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
-		if pbSeverity >= z.severityThreshold {
-			red.Printf("Problem : %s\n", pb.Name)
-			red.Printf("Severity: %s\n", pb.Severity)
-			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:red\">Error</span>"})
-		} else {
-			green.Printf("Problem : %s\n", pb.Name)
-			green.Printf("Severity: %s\n", pb.Severity)
-			reportTable = append(reportTable, []string{pb.Name, pb.Severity, "<span style=\"color:green\">OK</span>"})
+		r := results.Result{
+			Title: fmt.Sprintf("%s (%s)", pb.Name, pb.Severity),
+			Pass:  pbSeverity >= z.severityThreshold,
 		}
+		reportTable = append(reportTable, r)
+		r.PrintToStdout()
 		idx++
 	}
 	return
