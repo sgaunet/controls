@@ -33,8 +33,7 @@ func ReadyamlConfigFile(filename string) (YamlConfig, error) {
 }
 
 func (y *YamlConfig) CheckAsserts() (confOK bool) {
-	var red *color.Color
-	red = color.New(color.FgRed, color.Bold)
+	var red *color.Color = color.New(color.FgRed, color.Bold)
 
 	confOK = true
 	for _, asserts := range y.SshAsserts {
