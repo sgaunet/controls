@@ -47,16 +47,16 @@ func (r *reportPdf) AddTable(title string, results []results.Result) {
 	r.report.TableList(header, contents, props.TableList{
 		HeaderProp: props.TableListContent{
 			Size:      12,
-			GridSizes: []uint{6, 6},
+			GridSizes: []uint{8, 4},
 		},
 		ContentProp: props.TableListContent{
-			Size:      12,
-			GridSizes: []uint{6, 6},
+			Size:      8,
+			GridSizes: []uint{8, 4},
 		},
 		Align:                consts.Left,
 		AlternatedBackground: &grayColor,
 		HeaderContentSpace:   1,
-		Line:                 false,
+		Line:                 true,
 	})
 }
 

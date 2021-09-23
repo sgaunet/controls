@@ -90,7 +90,7 @@ func main() {
 	}
 
 	if len(configApp.SshServers) != 0 {
-		rPdf.AddLine()
+		//rPdf.AddLine()
 		rPdf.AddSection("SSH Asserts")
 		// Loop over group of servers
 		for serverGroupName, servers := range configApp.SshServers {
@@ -106,7 +106,7 @@ func main() {
 	//rPdf.AddPAgeBreak()
 
 	if len(configApp.AssertsHTTP) != 0 {
-		rPdf.AddLine()
+		//rPdf.AddLine()
 		rPdf.AddSection("HTTP controls")
 		//r.AddTable("", httpctl.LaunchControls(configApp.AssertsHTTP))
 		results := httpctl.LaunchControls(configApp.AssertsHTTP)
@@ -116,7 +116,7 @@ func main() {
 
 	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
 		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
-		rPdf.AddLine()
+		//rPdf.AddLine()
 		rPdf.AddSection("Zabbix controls")
 		fmt.Println()
 
@@ -134,7 +134,7 @@ func main() {
 		}
 	}
 
-	rPdf.AddLine()
+	//rPdf.AddLine()
 	//r.AddFooter()
 	rPdf.AddFooter()
 	err = rPdf.Export(reportPath)
