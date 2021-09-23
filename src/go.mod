@@ -3,7 +3,6 @@ module github.com/sgaunet/controls
 go 1.16
 
 require (
-	github.com/atsushinee/go-markdown-generator v0.0.0-20191121114853-83f9e1f68504
 	github.com/fatih/color v1.12.0
 	github.com/johnfercher/maroto v0.33.0
 	github.com/lib/pq v1.10.2
