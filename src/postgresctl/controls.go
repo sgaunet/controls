@@ -44,50 +44,10 @@ func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
 			}
 		} else {
 			// Connexion to DB is ok
-			onedb.CalcDatabaseSize()
-			onedb.CalcCnx()
-
-			if onedb.GetDBSizeGo() > onedb.Cfg.Dbsizelimit {
-				result := results.Result{
-					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
-					Result: fmt.Sprintf("%d Go", onedb.GetDBSizeGo()),
-					Pass:   false,
-				}
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
-
-			} else {
-				result := results.Result{
-					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
-					Result: fmt.Sprintf("%d Go", onedb.GetDBSizeGo()),
-					Pass:   true,
-				}
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
-			}
-			if onedb.NbUsedConnections == onedb.NbMaxConnections {
-				result := results.Result{
-					Result: "Nb used connections == Nb max connections",
-					Pass:   false,
-				}
-				result.Title = fmt.Sprintf("Nb connections (%s)", onedb.Cfg.Dbhost)
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
-				result.Title = fmt.Sprintf("Nb max connections (%s)", onedb.Cfg.Dbhost)
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
-			} else {
-				result := results.Result{
-					Result: fmt.Sprintf("%d", onedb.NbUsedConnections),
-					Pass:   true,
-				}
-				result.Title = fmt.Sprintf("Nb connections (%s)", onedb.Cfg.Dbhost)
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
-				result.Title = fmt.Sprintf("Nb max connections (%s)", onedb.Cfg.Dbhost)
-				result.Result = fmt.Sprintf("%d", onedb.NbMaxConnections)
-				result.PrintToStdout()
-				resultTable = append(resultTable, result)
+			onedb.CollectInfos() // !TODO Check err
+			results := onedb.LaunchControl()
+			for _, r := range results {
+				resultTable = append(resultTable, r)
 			}
 		}
 		idx++

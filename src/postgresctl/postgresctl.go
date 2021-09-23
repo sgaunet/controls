@@ -6,6 +6,7 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq" // for postgresql
+	"github.com/sgaunet/controls/results"
 )
 
 // Connect connects to postgresql database
@@ -91,7 +92,6 @@ func (db *PostgresDB) CalcCnx() (err error) {
 
 // CollectInfos collects informations about sensors
 func (db *PostgresDB) CollectInfos() (err error) {
-
 	if !db.CheckConn() {
 		fmt.Println("CollectInfos : not connected to " + db.Cfg.Dbhost)
 		db.Connect()
@@ -106,4 +106,28 @@ func (db *PostgresDB) CollectInfos() (err error) {
 	err = db.CalcCnx()
 
 	return err
+}
+
+func (db *PostgresDB) LaunchControl() (resultTable []results.Result) {
+	r := db.ControlDBSize()
+	resultTable = append(resultTable, r)
+	r = db.ControlConnections()
+	resultTable = append(resultTable, r)
+	return resultTable
+}
+
+func (db *PostgresDB) ControlDBSize() (result results.Result) {
+	result.Result = fmt.Sprintf("%d Go", db.GetDBSizeGo())
+	result.Title = fmt.Sprintf("DB Size (%s - limit %d)", db.GetDbHost(), db.Cfg.Dbsizelimit)
+	result.Pass = db.GetDBSizeGo() < db.Cfg.Dbsizelimit
+	result.PrintToStdout()
+	return result
+}
+
+func (db *PostgresDB) ControlConnections() (result results.Result) {
+	result.Result = fmt.Sprintf("%d/%d", db.NbUsedConnections, db.NbReservedForNormalUser)
+	result.Title = fmt.Sprintf("Nb connections (%s)", db.Cfg.Dbhost)
+	result.Pass = db.NbUsedConnections <= db.NbReservedForNormalUser
+	result.PrintToStdout()
+	return result
 }
