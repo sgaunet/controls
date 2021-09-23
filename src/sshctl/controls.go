@@ -3,7 +3,6 @@ package sshctl
 import (
 	"fmt"
 	"io/ioutil"
-	"strings"
 	"time"
 
 	"github.com/sgaunet/controls/results"
@@ -26,10 +25,10 @@ func PublicKeyFile(file string) ssh.AuthMethod {
 	return ssh.PublicKeys(key)
 }
 
-func EscapeForMarkdown(str string) string {
-	tmp := strings.ReplaceAll(str, "\n", "<br>")
-	return strings.ReplaceAll(tmp, "|", "\\|")
-}
+// func EscapeForMarkdown(str string) string {
+// 	tmp := strings.ReplaceAll(str, "\n", "<br>")
+// 	return strings.ReplaceAll(tmp, "|", "\\|")
+// }
 
 func LaunchControls(cfgSrv []sshserver.SSHServer, asserts []AssertSSH) (resultTable []results.Result) {
 	red := color.New(color.FgRed, color.Bold)
