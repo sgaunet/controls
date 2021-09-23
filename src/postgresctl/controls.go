@@ -46,13 +46,11 @@ func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
 			// Connexion to DB is ok
 			onedb.CalcDatabaseSize()
 			onedb.CalcCnx()
-			// Convert size to Go
-			size := onedb.Size / 1024 / 1024 / 1024
 
-			if onedb.Size > onedb.Cfg.Dbsizelimit {
+			if onedb.GetDBSizeGo() > onedb.Cfg.Dbsizelimit {
 				result := results.Result{
 					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
-					Result: fmt.Sprintf("%d Go", size),
+					Result: fmt.Sprintf("%d Go", onedb.GetDBSizeGo()),
 					Pass:   false,
 				}
 				result.PrintToStdout()
@@ -61,7 +59,7 @@ func LaunchControls(cfgdbs []DbConfig) (resultTable []results.Result) {
 			} else {
 				result := results.Result{
 					Title:  fmt.Sprintf("DB Size (%s - limit %d)", onedb.GetDbHost(), onedb.Cfg.Dbsizelimit),
-					Result: fmt.Sprintf("%d Go", size),
+					Result: fmt.Sprintf("%d Go", onedb.GetDBSizeGo()),
 					Pass:   true,
 				}
 				result.PrintToStdout()

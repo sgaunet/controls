@@ -61,6 +61,10 @@ func (db *PostgresDB) CalcDatabaseSize() (err error) {
 	return err
 }
 
+func (db *PostgresDB) GetDBSizeGo() int {
+	return db.Size / 1024 / 1024 / 1024
+}
+
 func (db *PostgresDB) CalcCnx() (err error) {
 	var rows *sql.Rows
 	rows, err = db.Conn.Query(`select max_conn,used,res_for_super,max_conn-used-res_for_super res_for_normal 
