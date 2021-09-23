@@ -49,7 +49,6 @@ func LaunchControls(asserts []AssertHTTP) (resultTable []results.Result) {
 		res := ctlHTTP(assert)
 		res.PrintToStdout()
 		resultTable = append(resultTable, res)
-		// newHttpControl.PrintToStdout()
 		idx++
 	}
 	return resultTable
