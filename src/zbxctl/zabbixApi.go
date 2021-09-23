@@ -122,8 +122,9 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 			fmt.Fprintln(os.Stderr, err.Error())
 		}
 		r := results.Result{
-			Title: fmt.Sprintf("%s (%s)", pb.Name, pb.Severity),
-			Pass:  pbSeverity >= z.severityThreshold,
+			Title:  fmt.Sprintf("%s", pb.Name),
+			Result: fmt.Sprintf("Severity : %s (Threshold : %d)", pb.Severity, z.severityThreshold),
+			Pass:   pbSeverity < z.severityThreshold,
 		}
 		reportTable = append(reportTable, r)
 		r.PrintToStdout()
