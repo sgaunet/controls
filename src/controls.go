@@ -79,6 +79,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	isConfOk := configApp.CheckAsserts()
+	if !isConfOk {
+		os.Exit(1)
+	}
+
 	//r := reportmd.New()
 	rPdf := reportpdf.New()
 	rPdf.AddTitle("Controls")
