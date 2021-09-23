@@ -8,13 +8,16 @@ db:
 
 sshAsserts:
   GROUP1:
-    - cmd: "systemctl status ntpd > /dev/null 2>&1; echo $?"
+    - cmd: "systemctl status cron > /dev/null 2>&1; echo $?"
       expected: "0"
+      title: Check cron
   GROUP2:
-    - cmd: script.sh | awk '($3=="running"){ print $0 }' | wc -l
-      expected: "18"
+    - cmd: echo "titi" | awk '($1=="titi"){ print $0 }' | wc -l
+      expected: "1"
+      title: check script.sh
     - cmd: echo foo
       expected: "foo"
+      title: Check echo
 
 sshServers:
   GROUP1:
@@ -35,11 +38,16 @@ sshServers:
 assertsHTTP:
   - host: https://www.google.fr
     #hostheader: real.dns.fr
-    comment: Test de Google
+    title: Test de Google
+
   - host: https://www.docker.com
-    comment: Test ...
-  - host: https://www.docker.fr
+    title: Test https://www.docker.com
+
+  #- host: https://www.docker.fr
+  #  title: Test https://www.docker.fr
+
   - host: https://github.com
+    title: Test https://github.com
 
 zbxCtl:
   apiEndpoint: "http://localhost:8080/api_jsonrpc.php"
