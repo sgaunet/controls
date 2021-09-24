@@ -1,6 +1,7 @@
 package httpctl
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/sgaunet/controls/results"
@@ -36,8 +37,10 @@ func ctlHTTP(assertHTTP AssertHTTP) results.Result {
 	// }
 	//fmt.Println(resp.StatusCode)
 	// statusCode := strconv.Itoa(resp.StatusCode)
+	r.Result = fmt.Sprintf("StatusCode: %d", resp.StatusCode)
 	if resp.StatusCode >= 200 && resp.StatusCode < 400 {
 		r.Pass = true
+		r.Result = "ok"
 	}
 
 	return r
