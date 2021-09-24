@@ -107,12 +107,13 @@ func (r *reportPdf) Export(reportpath string) error {
 	return r.report.OutputFileAndClose(reportpath)
 }
 
-func (r *reportPdf) AddFooter() {
+func (r *reportPdf) AddFooter(version string) {
 
 	blueColor := getBlueColor()
 
 	var host string
 	generated := "Generated at: " + time.Now().Format("02-Jan-2006 15:04:05")
+	versionStr := "Version : " + version
 	hostname, err := os.Hostname()
 	if err == nil {
 		host = "Generated on: " + hostname
@@ -130,6 +131,13 @@ func (r *reportPdf) AddFooter() {
 				})
 				r.report.Text(host, props.Text{
 					Top:   16,
+					Style: consts.BoldItalic,
+					Size:  8,
+					Align: consts.Left,
+					Color: blueColor,
+				})
+				r.report.Text(versionStr, props.Text{
+					Top:   19,
 					Style: consts.BoldItalic,
 					Size:  8,
 					Align: consts.Left,
