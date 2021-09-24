@@ -96,12 +96,12 @@ func main() {
 
 	if len(configApp.SshServers) != 0 {
 		//rPdf.AddLine()
-		rPdf.AddSection("SSH Asserts")
+		rPdf.AddSection("SSH controls")
 		// Loop over group of servers
 		for serverGroupName, servers := range configApp.SshServers {
 			for assertsGroupName, asserts := range configApp.SshAsserts {
 				if serverGroupName == assertsGroupName {
-					rPdf.AddTable("SSH asserts for group "+serverGroupName, sshctl.LaunchControls(servers, asserts))
+					rPdf.AddTable("SSH controls for group "+serverGroupName, sshctl.LaunchControls(servers, asserts))
 					break
 				}
 			}
@@ -141,7 +141,7 @@ func main() {
 
 	//rPdf.AddLine()
 	//r.AddFooter()
-	rPdf.AddFooter()
+	rPdf.AddFooter(version)
 	err = rPdf.Export(reportPath)
 
 	//err = r.Export(reportPath)
