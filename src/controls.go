@@ -88,6 +88,26 @@ func main() {
 	rPdf := reportpdf.New()
 	rPdf.AddTitle("Controls")
 
+	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
+		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
+		//rPdf.AddLine()
+		rPdf.AddSection("Zabbix controls")
+		fmt.Println()
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "Cannot login into zabbix API")
+			rPdf.AddTable("", z.FailedResultControls(err))
+		} else {
+			defer z.Logout()
+			res, err := z.LaunchControls()
+			if err == nil {
+				rPdf.AddTable("", res)
+			} else {
+				rPdf.AddTable("", z.FailedResultControls(err))
+			}
+		}
+	}
+
 	if len(configApp.Db) != 0 {
 		rPdf.AddSection("Databases controls")
 		//r.AddTable(toto)
@@ -117,26 +137,6 @@ func main() {
 		results := httpctl.LaunchControls(configApp.AssertsHTTP)
 		rPdf.AddTable("HTTP", results)
 		fmt.Println()
-	}
-
-	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
-		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
-		//rPdf.AddLine()
-		rPdf.AddSection("Zabbix controls")
-		fmt.Println()
-
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "Cannot login into zabbix API")
-			rPdf.AddTable("", z.FailedResultControls(err))
-		} else {
-			defer z.Logout()
-			res, err := z.LaunchControls()
-			if err == nil {
-				rPdf.AddTable("", res)
-			} else {
-				rPdf.AddTable("", z.FailedResultControls(err))
-			}
-		}
 	}
 
 	//rPdf.AddLine()
