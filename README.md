@@ -1,3 +1,6 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/controls)](https://goreportcard.com/report/github.com/sgaunet/controls)
+
+
 # controls
 
 Little CLI to launch series of controls:
