@@ -9,8 +9,8 @@ github.com/fatih/color v1.15.0/go.mod h1:0h5ZqXfHYED7Bhv2ZJamyIOUej9KtShiJESRwBD
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.3.1 h1:KjJaJ9iWZ3jOFZIf1Lqf4laDRCasjl0BCmnEGxkdLb4=
 github.com/google/uuid v1.3.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/johnfercher/maroto v0.42.0 h1:NlZQsSyfDnBcGBZ6M6ZV+PDrdwzoiClzbWp872viP+g=
-github.com/johnfercher/maroto v0.42.0/go.mod h1:qeujdhKT+677jMjGWlIa5OCgR04GgIHvByJ6pSC+hOw=
+github.com/johnfercher/maroto v1.0.0 h1:yo26a/Mxj2YbHCzpIW7FypKtdvv9BdeLNHaApHwLCXU=
+github.com/johnfercher/maroto v1.0.0/go.mod h1:qeujdhKT+677jMjGWlIa5OCgR04GgIHvByJ6pSC+hOw=
 github.com/jung-kurt/gofpdf v1.0.0/go.mod h1:7Id9E/uU8ce6rXgefFLlgrJj/GYY22cpxn+r32jIOes=
 github.com/jung-kurt/gofpdf v1.16.2 h1:jgbatWHfRlPYiK85qgevsZTHviWXKwB1TTiKdz5PtRc=
 github.com/jung-kurt/gofpdf v1.16.2/go.mod h1:1hl7y57EsiPAkLbOwzpzqgx1A30nQCk/YmFV8S2vmK0=
