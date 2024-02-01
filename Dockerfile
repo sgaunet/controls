@@ -18,7 +18,7 @@ RUN upx /go/src/controls
 
 
 
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 RUN addgroup -S ctluser_group -g 1000 && adduser -S ctluser -G ctluser_group --uid 1000
 RUN apk add --update --no-cache bash \
