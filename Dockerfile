@@ -1,5 +1,5 @@
 
-FROM golang:1.21.6-alpine AS builder
+FROM golang:1.22.0-alpine AS builder
 LABEL stage=builder
 
 RUN apk add --no-cache git upx
