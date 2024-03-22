@@ -47,10 +47,13 @@ func printVersion() {
 }
 
 func main() {
-	var configFile string
-	var reportPath string
-	var debugLevel string
-	var vOption bool
+	var (
+		configFile string
+		reportPath string
+		debugLevel string
+		vOption    bool
+		z          zbxctl.ZabbixApi
+	)
 	flag.StringVar(&configFile, "f", "", "YAML file to parse.")
 	flag.StringVar(&reportPath, "o", "", "Report tot create (md format")
 	flag.StringVar(&debugLevel, "d", "debug", "Debug level (info,warn,debug)")
@@ -88,8 +91,8 @@ func main() {
 	rPdf := reportpdf.New()
 	rPdf.AddTitle("Controls")
 
-	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
-		z, err := zbxctl.New(configApp.ZbxCtl)
+	if configApp.ZbxCtl.APIEndpoint != "" {
+		z, err = zbxctl.New(&configApp.ZbxCtl)
 		//rPdf.AddLine()
 		rPdf.AddSection("Zabbix controls")
 		fmt.Println()

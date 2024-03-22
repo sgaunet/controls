@@ -2,10 +2,11 @@ package zbxctl
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,9 +15,12 @@ import (
 	"github.com/sgaunet/controls/results"
 )
 
-func New(cfg ZbxCtl) (ZabbixApi, error) {
+func New(cfg *ZbxCtl) (ZabbixApi, error) {
 	z := ZabbixApi{
-		cfg: cfg,
+		cfg: *cfg,
+		client: &http.Client{
+			Timeout: time.Second * 5,
+		},
 	}
 	data := zbxLogin{
 		JsonRPC: "2.0",
@@ -34,12 +38,19 @@ func New(cfg ZbxCtl) (ZabbixApi, error) {
 		return z, err
 	}
 	responseBody := bytes.NewBuffer(postBody)
-	resp, err := http.Post(z.cfg.ApiEndpoint, "application/json", responseBody)
+	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, responseBody)
+	if err != nil {
+		return z, err
+	}
+	req = req.WithContext(context.TODO())
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := z.client.Do(req)
 	if err != nil {
 		// log.Fatalf("An Error Occured %v", err)
 		return z, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return z, err
 	}
@@ -67,10 +78,18 @@ func (z *ZabbixApi) Logout() error {
 
 	postBody, _ := json.Marshal(data2)
 	responseBody := bytes.NewBuffer(postBody)
-	_, err := http.Post(z.cfg.ApiEndpoint, "application/json", responseBody)
+	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, responseBody)
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(context.TODO())
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := z.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 	return err
-	//body, err := ioutil.ReadAll(resp.Body)
-	//fmt.Println(string(body))
 }
 
 func (z *ZabbixApi) FailedResultControls(err error) (reportTable []results.Result) {
@@ -100,13 +119,25 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 		Id:   1,
 	}
 
-	enc, _ := json.Marshal(dataGetProblem)
-	resp, err := http.Post(z.cfg.ApiEndpoint, "application/json", bytes.NewBuffer(enc))
-	//Handle Error
+	enc, err := json.Marshal(dataGetProblem)
 	if err != nil {
-		return
+		return reportTable, err
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
+	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, bytes.NewBuffer(enc))
+	if err != nil {
+		return reportTable, err
+	}
+	req = req.WithContext(context.TODO())
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := z.client.Do(req)
+	if err != nil {
+		return reportTable, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return reportTable, err
+	}
+	defer resp.Body.Close()
 	var obj map[string]interface{}
 	json.Unmarshal(body, &obj)
 
@@ -117,7 +148,6 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 	idx := 0
 
 	for _, pb := range resultProblems.Result {
-		fmt.Println(pb)
 		pbSeverity, err := strconv.Atoi(pb.Severity)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())

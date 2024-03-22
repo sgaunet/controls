@@ -1,8 +1,11 @@
 package zbxctl
 
+import "net/http"
+
 type ZabbixApi struct {
-	cfg  ZbxCtl
-	auth string // auth token
+	client *http.Client
+	cfg    ZbxCtl
+	auth   string // auth token
 }
 
 type zbxParams struct {
