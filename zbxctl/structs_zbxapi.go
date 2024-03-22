@@ -1,10 +1,8 @@
 package zbxctl
 
 type ZabbixApi struct {
-	auth              string
-	url               string
-	since             int
-	severityThreshold int
+	cfg  ZbxCtl
+	auth string // auth token
 }
 
 type zbxParams struct {
@@ -33,11 +31,18 @@ type zbxLoginReturn struct {
 	Id      int    `json:"id"`
 }
 
+type zbxTagsFilterProblem struct {
+	Tag      string `json:"tag" yaml:"tag"`
+	Value    string `json:"value" yaml:"value"`
+	Operator string `json:"operator" yaml:"operator"`
+}
+
 type zbxParamsProblem struct {
-	Suppressed   bool   `json:"suppressed"`
-	Recent       bool   `json:"recent"`
-	Acknowledged bool   `json:"acknowledged"`
-	Time_from    string `json:"time_from"`
+	Suppressed   bool                   `json:"suppressed"`
+	Recent       bool                   `json:"recent"`
+	Acknowledged bool                   `json:"acknowledged"`
+	Time_from    string                 `json:"time_from"`
+	Tags         []zbxTagsFilterProblem `json:"tags"`
 }
 
 type zbxGetProblem struct {

@@ -89,7 +89,7 @@ func main() {
 	rPdf.AddTitle("Controls")
 
 	if len(configApp.ZbxCtl.ApiEndpoint) != 0 {
-		z, err := zbxctl.New(configApp.ZbxCtl.User, configApp.ZbxCtl.Password, configApp.ZbxCtl.ApiEndpoint, configApp.ZbxCtl.Since, configApp.ZbxCtl.SeverityThreshold)
+		z, err := zbxctl.New(configApp.ZbxCtl)
 		//rPdf.AddLine()
 		rPdf.AddSection("Zabbix controls")
 		fmt.Println()
