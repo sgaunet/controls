@@ -2,13 +2,12 @@
 # Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
-    - go get
+    - go mod download
     # you may remove this if you don't need go generate
     #- go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
-    # dir: src
     id: controls
     ldflags:
       - -X main.version={{.Version}}
@@ -22,15 +21,8 @@ builds:
 
 archives:
   - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    format_overrides:
-    - goos: windows
-      format: zip
+    format: binary
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -41,4 +33,3 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-
