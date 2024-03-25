@@ -2,6 +2,8 @@ package zbxctl
 
 import (
 	"strings"
+
+	"github.com/sgaunet/controls/internal/config"
 )
 
 func convertOperator(operator string) string {
@@ -24,7 +26,7 @@ func convertOperator(operator string) string {
 	}
 }
 
-func convertZbxTagsFilter(tagsFilterConfig []ZbxTagsFilterProblemConfig) []zbxTagsFilterProblem {
+func convertZbxTagsFilter(tagsFilterConfig []config.ZbxTagsFilterProblemConfig) []zbxTagsFilterProblem {
 	zTags := make([]zbxTagsFilterProblem, len(tagsFilterConfig))
 	for i, zTag := range tagsFilterConfig {
 		zTags[i].Operator = convertOperator(zTag.Operator)

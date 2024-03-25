@@ -12,10 +12,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/sgaunet/controls/internal/config"
 	"github.com/sgaunet/controls/internal/results"
 )
 
-func New(cfg *ZbxCtlConfig) (ZabbixApi, error) {
+func New(cfg *config.ZbxCtlConfig) (ZabbixApi, error) {
 	z := ZabbixApi{
 		APIEndpoint:          cfg.APIEndpoint,
 		User:                 cfg.User,

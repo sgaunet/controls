@@ -5,7 +5,6 @@ import (
 
 	"github.com/sgaunet/controls/internal/config"
 	"github.com/sgaunet/controls/internal/httpctl"
-	"github.com/sgaunet/controls/internal/zbxctl"
 )
 
 func TestYamlConfig_IsValid(t *testing.T) {
@@ -22,13 +21,13 @@ func TestYamlConfig_IsValid(t *testing.T) {
 		{
 			name: "zabbix config with empty user",
 			cfg: config.YamlConfig{
-				ZbxCtl: &zbxctl.ZbxCtlConfig{
+				ZbxCtl: &config.ZbxCtlConfig{
 					APIEndpoint:          "http://localhost",
 					User:                 "",
 					Password:             "password",
 					Since:                0,
 					SeverityThreshold:    0,
-					FilterProblemsByTags: []zbxctl.ZbxTagsFilterProblemConfig{},
+					FilterProblemsByTags: []config.ZbxTagsFilterProblemConfig{},
 				},
 			},
 			want: false,
@@ -36,13 +35,13 @@ func TestYamlConfig_IsValid(t *testing.T) {
 		{
 			name: "zabbix config with empty password",
 			cfg: config.YamlConfig{
-				ZbxCtl: &zbxctl.ZbxCtlConfig{
+				ZbxCtl: &config.ZbxCtlConfig{
 					APIEndpoint:          "http://localhost",
 					User:                 "user",
 					Password:             "",
 					Since:                0,
 					SeverityThreshold:    0,
-					FilterProblemsByTags: []zbxctl.ZbxTagsFilterProblemConfig{},
+					FilterProblemsByTags: []config.ZbxTagsFilterProblemConfig{},
 				},
 			},
 			want: false,
@@ -50,13 +49,13 @@ func TestYamlConfig_IsValid(t *testing.T) {
 		{
 			name: "zabbix config with endpoint",
 			cfg: config.YamlConfig{
-				ZbxCtl: &zbxctl.ZbxCtlConfig{
+				ZbxCtl: &config.ZbxCtlConfig{
 					APIEndpoint:          "",
 					User:                 "user",
 					Password:             "****",
 					Since:                0,
 					SeverityThreshold:    0,
-					FilterProblemsByTags: []zbxctl.ZbxTagsFilterProblemConfig{},
+					FilterProblemsByTags: []config.ZbxTagsFilterProblemConfig{},
 				},
 			},
 			want: false,
@@ -64,13 +63,13 @@ func TestYamlConfig_IsValid(t *testing.T) {
 		{
 			name: "zabbix config with FilterProblemsByTags malformated",
 			cfg: config.YamlConfig{
-				ZbxCtl: &zbxctl.ZbxCtlConfig{
+				ZbxCtl: &config.ZbxCtlConfig{
 					APIEndpoint:       "http://localhost",
 					User:              "user",
 					Password:          "****",
 					Since:             0,
 					SeverityThreshold: 0,
-					FilterProblemsByTags: []zbxctl.ZbxTagsFilterProblemConfig{
+					FilterProblemsByTags: []config.ZbxTagsFilterProblemConfig{
 						{
 							Tag:      "tag",
 							Value:    "value",
@@ -84,13 +83,13 @@ func TestYamlConfig_IsValid(t *testing.T) {
 		{
 			name: "zabbix config OK",
 			cfg: config.YamlConfig{
-				ZbxCtl: &zbxctl.ZbxCtlConfig{
+				ZbxCtl: &config.ZbxCtlConfig{
 					APIEndpoint:       "http://localhost",
 					User:              "user",
 					Password:          "****",
 					Since:             0,
 					SeverityThreshold: 0,
-					FilterProblemsByTags: []zbxctl.ZbxTagsFilterProblemConfig{
+					FilterProblemsByTags: []config.ZbxTagsFilterProblemConfig{
 						{
 							Tag:      "tag",
 							Value:    "value",
