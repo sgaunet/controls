@@ -48,12 +48,14 @@ func printVersion() {
 
 func main() {
 	var (
-		configFile string
-		reportPath string
-		debugLevel string
-		vOption    bool
-		z          zbxctl.ZabbixApi
+		configFile    string
+		reportPath    string
+		debugLevel    string
+		configExample bool
+		vOption       bool
+		z             zbxctl.ZabbixApi
 	)
+	flag.BoolVar(&configExample, "config", false, "Print example of configuration")
 	flag.StringVar(&configFile, "f", "", "YAML file to parse.")
 	flag.StringVar(&reportPath, "o", "", "Report tot create (md format")
 	flag.StringVar(&debugLevel, "d", "debug", "Debug level (info,warn,debug)")
@@ -61,6 +63,11 @@ func main() {
 	flag.Parse()
 
 	initTrace(debugLevel)
+
+	if configExample {
+		fmt.Println(config.ExampleConfig())
+		os.Exit(0)
+	}
 
 	if vOption {
 		printVersion()

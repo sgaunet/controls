@@ -4,9 +4,18 @@ import (
 	"fmt"
 	"os"
 
+	_ "embed"
+
 	"github.com/go-playground/validator/v10"
 	"gopkg.in/yaml.v2"
 )
+
+//go:embed config-example.yaml
+var exampleConfig string
+
+func ExampleConfig() string {
+	return exampleConfig
+}
 
 func ReadyamlConfigFile(filename string) (YamlConfig, error) {
 	var yamlConfig YamlConfig

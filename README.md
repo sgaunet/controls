@@ -21,64 +21,9 @@ Want a PDF ? [Convert the markdown to html](https://github.com/sgaunet/mdtohtml)
 
 Configuration file :
 
-```
-db:
-  - dbhost: db1.pg.local
-    dbuser: postgres
-    dbpassword: ...
-    dbport: 5432
-    dbname: mydb
-    sizelimit: 400    # Go
-  - dbhost: db2.pg.local
-    dbuser: postgres
-    dbpassword: 
-    dbport: 5432
-    dbname: mydb
-    sizelimit: 400
-
-sshAsserts:
-  GROUP1:
-    - cmd: "systemctl status ntpd > /dev/null 2>&1; echo $?"
-      expected: "0"
-  GROUP2:
-    - cmd: script.sh | awk '($3=="running"){ print $0 }' | wc -l
-      expected: "18"
-    - cmd: echo foo
-      expected: "foo"
-
-sshServers:
-  GROUP1:
-    - host: host1.mysociety.local
-      user: ubuntu
-      password: 
-      sshkey:                         # prefered
-    - host: host2.mysociety.local
-      user: ec2-user
-      password: 
-      sshkey: 
-  GROUP2:
-    - host: host3.mysociety.local
-      user: myuser
-      password: 
-      sshkey: 
-
-assertsHTTP:
-  - host: http://internal-e2734db1-foo-bar-66vy-345675678.eu-west-3.elb.amazonaws.com
-    hostheader: real.dns.fr
-    comment: Internal check (internal Load Balancer)
-
-zbxCtl:
-  apiEndpoint: "http://zbx.mysociety.local/api_jsonrpc.php"
-  user: "LOGIN"
-  password: ""
-  since: 172800   # 2 days
-  severityThreshold: 4
-  
-  # https://www.zabbix.com/documentation/current/en/manual/api/reference/problem/get
-  filterProblemsByTags:
-    - tag: "oncall"
-      value: "false"
-      operator: "Not exists"
+```bash
+# get an example of configuration
+controls -config
 ```
 
 # Tests
