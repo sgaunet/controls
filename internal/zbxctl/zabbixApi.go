@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sgaunet/controls/results"
+	"github.com/sgaunet/controls/internal/results"
 )
 
 func New(cfg *ZbxCtl) (ZabbixApi, error) {

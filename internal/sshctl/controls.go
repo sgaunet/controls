@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/sgaunet/controls/results"
-	"github.com/sgaunet/controls/sshserver"
+	"github.com/sgaunet/controls/internal/results"
+	"github.com/sgaunet/controls/internal/sshserver"
 
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"

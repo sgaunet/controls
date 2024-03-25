@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sgaunet/controls/results"
+	"github.com/sgaunet/controls/internal/results"
 )
 
 func ctlHTTP(assertHTTP AssertHTTP) results.Result {

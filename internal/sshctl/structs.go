@@ -1,6 +1,6 @@
 package sshctl
 
-import "github.com/sgaunet/controls/sshserver"
+import "github.com/sgaunet/controls/internal/sshserver"
 
 type Server struct {
 	Cfg sshserver.SSHServer
@@ -14,7 +14,7 @@ type sshControl struct {
 	passed         bool
 }
 
-//Struct representing an SSH assertion
+// Struct representing an SSH assertion
 type AssertSSH struct {
 	Title          string `yaml:"title"`
 	Cmd            string `yaml:"cmd"`

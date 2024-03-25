@@ -3,7 +3,7 @@ package postgresctl
 import (
 	"fmt"
 
-	"github.com/sgaunet/controls/results"
+	"github.com/sgaunet/controls/internal/results"
 )
 
 func (db *PostgresDB) resultsWhenErrCnx() (resultTable []results.Result) {

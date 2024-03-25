@@ -6,7 +6,7 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq" // for postgresql
-	"github.com/sgaunet/controls/results"
+	"github.com/sgaunet/controls/internal/results"
 )
 
 // Connect connects to postgresql database

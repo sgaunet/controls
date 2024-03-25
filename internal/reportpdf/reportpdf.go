@@ -7,7 +7,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	"github.com/sgaunet/controls/results"
+	"github.com/sgaunet/controls/internal/results"
 )
 
 func New() *reportPdf {

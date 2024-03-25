@@ -4,7 +4,7 @@ dist
 result.md
 result.html
 controls.yaml
-controls
+/controls
 result.pdf
 conf.yaml
 *vault*
