@@ -3,9 +3,14 @@ package zbxctl
 import "net/http"
 
 type ZabbixApi struct {
-	client *http.Client
-	cfg    ZbxCtl
-	auth   string // auth token
+	client               *http.Client
+	auth                 string // auth token
+	APIEndpoint          string
+	User                 string
+	Password             string
+	Since                int
+	SeverityThreshold    int
+	FilterProblemsByTags []zbxTagsFilterProblem
 }
 
 type zbxParams struct {

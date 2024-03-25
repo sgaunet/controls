@@ -13,6 +13,6 @@ type YamlConfig struct {
 	Db          []postgresctl.DbConfig           `yaml:"db"`
 	SshServers  map[string][]sshserver.SSHServer `yaml:"sshServers"`
 	SshAsserts  map[string][]sshctl.AssertSSH    `yaml:"sshAsserts"`
-	AssertsHTTP []httpctl.AssertHTTP             `yaml:"assertsHTTP"`
-	ZbxCtl      zbxctl.ZbxCtl                    `yaml:"zbxCtl"`
+	AssertsHTTP []httpctl.AssertHTTP             `yaml:"assertsHTTP" validate:"dive"`
+	ZbxCtl      *zbxctl.ZbxCtlConfig             `yaml:"zbxCtl"`
 }

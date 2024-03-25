@@ -73,10 +73,12 @@ zbxCtl:
   password: ""
   since: 172800   # 2 days
   severityThreshold: 4
+  
+  # https://www.zabbix.com/documentation/current/en/manual/api/reference/problem/get
   filterProblemsByTags:
     - tag: "oncall"
       value: "false"
-      operator: "5"    # https://www.zabbix.com/documentation/current/en/manual/api/reference/problem/get
+      operator: "Not exists"
 ```
 
 # Tests

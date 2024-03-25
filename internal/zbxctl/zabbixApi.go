@@ -15,9 +15,14 @@ import (
 	"github.com/sgaunet/controls/internal/results"
 )
 
-func New(cfg *ZbxCtl) (ZabbixApi, error) {
+func New(cfg *ZbxCtlConfig) (ZabbixApi, error) {
 	z := ZabbixApi{
-		cfg: *cfg,
+		APIEndpoint:          cfg.APIEndpoint,
+		User:                 cfg.User,
+		Password:             cfg.Password,
+		Since:                cfg.Since,
+		SeverityThreshold:    cfg.SeverityThreshold,
+		FilterProblemsByTags: convertZbxTagsFilter(cfg.FilterProblemsByTags),
 		client: &http.Client{
 			Timeout: time.Second * 5,
 		},
@@ -26,8 +31,8 @@ func New(cfg *ZbxCtl) (ZabbixApi, error) {
 		JsonRPC: "2.0",
 		Method:  "user.login",
 		Params: zbxParams{
-			User:     z.cfg.User,
-			Password: z.cfg.Password,
+			User:     z.User,
+			Password: z.Password,
 		},
 		Id: 1,
 	}
@@ -38,7 +43,7 @@ func New(cfg *ZbxCtl) (ZabbixApi, error) {
 		return z, err
 	}
 	responseBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, responseBody)
+	req, err := http.NewRequest("POST", z.APIEndpoint, responseBody)
 	if err != nil {
 		return z, err
 	}
@@ -78,7 +83,7 @@ func (z *ZabbixApi) Logout() error {
 
 	postBody, _ := json.Marshal(data2)
 	responseBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, responseBody)
+	req, err := http.NewRequest("POST", z.APIEndpoint, responseBody)
 	if err != nil {
 		return err
 	}
@@ -103,8 +108,7 @@ func (z *ZabbixApi) FailedResultControls(err error) (reportTable []results.Resul
 }
 
 func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
-	since := strconv.FormatInt(time.Now().Add(time.Duration(-z.cfg.Since*int(time.Second))).Unix(), 10)
-
+	since := strconv.FormatInt(time.Now().Add(time.Duration(-z.Since*int(time.Second))).Unix(), 10)
 	dataGetProblem := zbxGetProblem{
 		JsonRPC: "2.0",
 		Method:  "problem.get",
@@ -113,7 +117,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 			Recent:       false,
 			Acknowledged: false,
 			Time_from:    since,
-			Tags:         z.cfg.FilterProblemsByTags,
+			Tags:         z.FilterProblemsByTags,
 		},
 		Auth: z.auth,
 		Id:   1,
@@ -123,7 +127,7 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 	if err != nil {
 		return reportTable, err
 	}
-	req, err := http.NewRequest("POST", z.cfg.APIEndpoint, bytes.NewBuffer(enc))
+	req, err := http.NewRequest("POST", z.APIEndpoint, bytes.NewBuffer(enc))
 	if err != nil {
 		return reportTable, err
 	}
@@ -154,8 +158,8 @@ func (z *ZabbixApi) LaunchControls() (reportTable []results.Result, err error) {
 		}
 		r := results.Result{
 			Title:  pb.Name,
-			Result: fmt.Sprintf("Severity : %s (Threshold : %d)", pb.Severity, z.cfg.SeverityThreshold),
-			Pass:   pbSeverity < z.cfg.SeverityThreshold,
+			Result: fmt.Sprintf("Severity : %s (Threshold : %d)", pb.Severity, z.SeverityThreshold),
+			Pass:   pbSeverity < z.SeverityThreshold,
 		}
 		reportTable = append(reportTable, r)
 		r.PrintToStdout()

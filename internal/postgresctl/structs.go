@@ -17,10 +17,10 @@ type PostgresDB struct {
 
 // Struct representing the connection to a postgres Database
 type DbConfig struct {
-	Dbhost      string `yaml:"dbhost"`
-	Dbport      string `yaml:"dbport"`
-	Dbuser      string `yaml:"dbuser"`
-	Dbpassword  string `yaml:"dbpassword"`
-	Dbname      string `yaml:"dbname"`
-	Dbsizelimit int    `yaml:"sizelimit"`
+	Dbhost      string `yaml:"dbhost" validate:"required"`
+	Dbport      string `yaml:"dbport" validate:"required"`
+	Dbuser      string `yaml:"dbuser" validate:"required"`
+	Dbpassword  string `yaml:"dbpassword" validate:"required"`
+	Dbname      string `yaml:"dbname" validate:"required"`
+	Dbsizelimit int    `yaml:"sizelimit" validate:"required"`
 }

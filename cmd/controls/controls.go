@@ -82,8 +82,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	isConfOk := configApp.CheckAsserts()
-	if !isConfOk {
+	if !configApp.IsValid() {
+		fmt.Fprintf(os.Stderr, "Invalid configuration: %v\n", configApp.Errors())
 		os.Exit(1)
 	}
 
@@ -92,7 +92,7 @@ func main() {
 	rPdf.AddTitle("Controls")
 
 	if configApp.ZbxCtl.APIEndpoint != "" {
-		z, err = zbxctl.New(&configApp.ZbxCtl)
+		z, err = zbxctl.New(configApp.ZbxCtl)
 		//rPdf.AddLine()
 		rPdf.AddSection("Zabbix controls")
 		fmt.Println()
