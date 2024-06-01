@@ -3,7 +3,7 @@ module github.com/sgaunet/controls
 go 1.20
 
 require (
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/johnfercher/maroto v1.0.0
 	github.com/lib/pq v1.10.9
