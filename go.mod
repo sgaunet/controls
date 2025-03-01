@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/fatih/color v1.18.0
-	github.com/go-playground/validator/v10 v10.24.0
+	github.com/go-playground/validator/v10 v10.25.0
 	github.com/johnfercher/maroto v1.0.0
 	github.com/lib/pq v1.10.9
 	github.com/sirupsen/logrus v1.9.3
